@@ -18,6 +18,7 @@
   <a href="#priorités-immédiates">Priorités</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#installation">Installation</a> •
+  <a href="#contribution">Contribution</a> •
   <a href="#stack-technique">Stack Technique</a> •
   <a href="#licence">Licence</a>
 </p>
@@ -391,7 +392,14 @@ MAPBOX_ACCESS_TOKEN=pk.xxx
 
 ## 🤝 Contribution
 
-Les contributions sont possibles, mais le dépôt ne contient pas encore de guide dédié `CONTRIBUTING.md`. En attendant, travaille sur une branche courte, garde des commits lisibles et valide les commandes de vérification avant ouverture d'une PR.
+Les contributions sont possibles. Le guide de contribution est disponible dans [CONTRIBUTING.md](CONTRIBUTING.md).
+
+En résumé :
+
+- travaille sur une branche courte
+- garde des commits lisibles
+- exécute les vérifications adaptées à la zone touchée
+- documente clairement le périmètre de ta PR
 
 1. Fork le projet
 2. Crée ta branche (`git checkout -b feature/ma-fonctionnalite`)
