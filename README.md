@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Réservation · Paiement Mobile · Suivi GPS en temps réel · Gestion de flotte
+  Réservation · Paiement mobile · Suivi GPS en temps réel · Gestion de flotte
 </p>
 
 <p align="center">
@@ -31,6 +31,20 @@
 L'application permet la **réservation de tickets**, le **paiement en ligne** (T-Money, Flooz), le **suivi des bus en temps réel** et l'**optimisation des opérations** pour les transporteurs.
 
 > **Mission** : Moderniser le secteur du transport routier togolais pour améliorer l'expérience des voyageurs et augmenter les revenus des transporteurs.
+
+---
+
+## 🚀 Résumé Exécutif
+
+Voyago vise un problème simple et concret : la majorité des trajets interurbains restent gérés de façon fragmentée, avec des réservations manuelles, peu de visibilité en temps réel et peu d'outils de pilotage pour les compagnies.
+
+Le produit réunit dans un même écosystème :
+
+- une expérience passager pour rechercher, réserver et suivre un trajet
+- des outils compagnie pour gérer la flotte, les départs et les ventes
+- une base technique pensée pour le paiement mobile, la géolocalisation et l'exploitation locale
+
+Aujourd'hui, le dépôt est surtout au stade de **socle produit stabilisé** : la base applicative existe, les vérifications principales passent, et les prochains gains se jouent sur le branchement métier final, la migration Supabase et l'automatisation CI/CD.
 
 ---
 
@@ -58,6 +72,14 @@ L'application permet la **réservation de tickets**, le **paiement en ligne** (T
 - Finaliser la migration Supabase côté authentification, données et temps réel
 - Mettre en place la CI/CD pour automatiser `build`, `lint` et `tests`
 - Documenter précisément les variables d'environnement par application
+
+---
+
+## 👥 Pour Qui
+
+- **Passagers** : réserver plus vite, payer à distance et suivre le départ
+- **Compagnies** : centraliser les ventes, les horaires, les véhicules et les indicateurs d'activité
+- **Exploitants / administrateurs** : piloter un réseau de transport avec plus de traçabilité
 
 ---
 
@@ -105,6 +127,17 @@ L'application permet la **réservation de tickets**, le **paiement en ligne** (T
 - 💸 **Gestion des commissions** — Configuration des taux (2% à 5%)
 - 🔐 **Modération** — Gestion des litiges et réclamations
 - 📢 **Communication** — Notifications push et annonces
+
+---
+
+## 🧭 Ce Que Montre Ce Dépôt
+
+- un `web/` en Next.js pour les parcours publics et les interfaces de gestion
+- une `api/` en Express + TypeScript pour la logique métier et les intégrations
+- un `mobile/` Expo pour préparer les parcours natifs
+- une `docs/` avec la documentation projet et la migration Supabase
+
+Le dépôt n'est pas encore une release produit finale. Il documente un produit en construction avec une base technique déjà vérifiée localement.
 
 ---
 
@@ -258,6 +291,14 @@ graph LR
 - `mobile/` : application Expo / React Native
 - `docs/` : documentation projet
 
+### Parcours recommandé pour un nouveau développeur
+
+1. Cloner le dépôt et installer les dépendances application par application
+2. Lire `README.md`, `PROGRESS.md` et `ROADMAP.md`
+3. Vérifier l'état local avec les commandes de build, lint, tests et TypeScript
+4. Identifier si le travail porte sur le `web`, l'`api`, le `mobile` ou la migration Supabase
+5. Ouvrir une branche courte avec un objectif clair et vérifiable
+
 ### Vérifications rapides
 
 ```bash
@@ -370,6 +411,14 @@ Les contributions sont possibles, mais le dépôt ne contient pas encore de guid
 | Adapté au contexte togolais | ✅ Conçu localement | ❌ Solutions importées |
 | B2B + B2C unifié | ✅ Plateforme unique | ❌ Outils séparés |
 | Multi-plateforme | ✅ Web + Mobile | ⚠️ Souvent web uniquement |
+
+---
+
+## 🤝 Pourquoi Le Projet Est Intéressant Techniquement
+
+- Le sujet mélange produit local, paiement mobile, temps réel et logistique.
+- Le monorepo permet de faire évoluer en parallèle le web, l'API, le mobile et la documentation.
+- Les prochains chantiers ont une vraie valeur d'ingénierie : CI/CD, migration Supabase, auth, données temps réel, qualité de livraison.
 
 ---
 
