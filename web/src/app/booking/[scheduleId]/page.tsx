@@ -183,7 +183,7 @@ export default function BookingPage() {
               <Card className="p-8 border-none shadow-voyago rounded-3xl">
                 <div className="flex justify-between items-center mb-8">
                   <h2 className="text-xl font-black">Choisissez vos sièges</h2>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-none">
+                  <Badge variant="info" className="bg-primary/10 text-primary border-none">
                     {selectedSeats.length} sélectionné(s)
                   </Badge>
                 </div>

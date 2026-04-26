@@ -135,7 +135,7 @@ export default function AdminOverview() {
             <h3 className="text-xl font-black">Activité des réservations</h3>
             <div className="flex gap-2">
               <Badge variant="info" className="bg-primary/10 text-primary border-none font-bold">Lomé</Badge>
-              <Badge variant="secondary" className="bg-slate-100 text-slate-500 border-none font-bold">Kara</Badge>
+              <Badge variant="info" className="bg-slate-100 text-slate-500 border-none font-bold">Kara</Badge>
             </div>
           </div>
           <div className="h-[340px] w-full">
@@ -232,7 +232,7 @@ function StatCard({ title, value, icon, trend, color }: any) {
         <div className={`p-4 rounded-2xl ${colors[color].split(' ').slice(1).join(' ')}`}>
           {icon}
         </div>
-        <Badge variant="secondary" className="bg-slate-100 text-slate-500 font-black text-[10px] tracking-widest">{trend}</Badge>
+        <Badge variant="info" className="bg-slate-100 text-slate-500 font-black text-[10px] tracking-widest">{trend}</Badge>
       </div>
       <div>
         <p className="text-xs font-black text-slate-400 uppercase mb-1 tracking-widest">{title}</p>

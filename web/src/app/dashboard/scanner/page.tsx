@@ -170,7 +170,7 @@ export default function ScannerPage() {
 
               <Button 
                 onClick={resetScanner} 
-                variant="destructive"
+                variant="danger"
                 className="w-full h-16 rounded-2xl text-lg font-black"
                 leftIcon={<RefreshCcw className="w-5 h-5" />}
               >

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import io, { Socket } from 'socket.io-client';
 import { Play, Pause, Navigation, Info } from 'lucide-react';
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/Card";
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
