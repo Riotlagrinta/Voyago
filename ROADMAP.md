@@ -61,7 +61,7 @@ gantt
 | # | Tâche | Détails | Priorité |
 |---|-------|---------|----------|
 | 0.1 | Initialiser le monorepo | Structure `web/`, `api/`, `mobile/`, `docs/` | 🔴 Critique |
-| 0.2 | Setup Next.js 15 (web) | App Router, TypeScript, configuration ESLint/Prettier | 🔴 Critique |
+| 0.2 | Setup Next.js (web) | App Router, TypeScript, configuration ESLint/Prettier | 🔴 Critique |
 | 0.3 | Setup API Node.js/Express | TypeScript, structure MVC, middleware de base | 🔴 Critique |
 | 0.4 | Setup PostgreSQL + PostGIS | Schéma initial, connexion Supabase, migrations | 🔴 Critique |
 | 0.5 | CI/CD | GitHub Actions (lint, tests, build) | 🟡 Important |
@@ -442,4 +442,4 @@ erDiagram
 
 ---
 
-> **Prochaine étape** : Démarrer la **Phase 0** — Initialisation du monorepo et setup technique.
+> **Prochaine étape recommandée** : Finaliser `0.5 CI/CD`, puis enchaîner sur la migration Supabase et le branchement des parcours métier restants.

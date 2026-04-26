@@ -1,7 +1,7 @@
 # ✅ Voyago — Suivi des Tâches
 
 > Dernière mise à jour : 2026-04-26
-> **Progression globale** : 20/85 tâches complétées (stabilisation technique et qualité validées)
+> **Progression globale** : 20/85 tâches complétées (socle technique stabilisé, chantier produit encore en cours)
 
 ---
 
@@ -24,7 +24,7 @@
 | Statut | # | Tâche | Date |
 |--------|---|-------|------|
 | ✅ | 0.1 | Initialiser le monorepo (`web/`, `api/`, `mobile/`, `docs/`) | 2026-04-15 |
-| ✅ | 0.2 | Setup Next.js 15 (web) | 2026-04-15 |
+| ✅ | 0.2 | Setup Next.js (web) | 2026-04-15 |
 | ✅ | 0.3 | Setup API Node.js/Express + TypeScript | 2026-04-15 |
 | ✅ | 0.4 | Setup PostgreSQL + PostGIS (Supabase) | 2026-04-24 |
 | ⬜ | 0.5 | CI/CD (GitHub Actions) | |
@@ -100,6 +100,17 @@
 | `api` - `npm run build` | ✅ | 2026-04-26 |
 | `api` - `npm test -- --runInBand` | ✅ | 2026-04-26 |
 | `mobile` - `npx tsc --noEmit` | ✅ | 2026-04-26 |
+
+---
+
+## 🎯 Points à lancer ensuite
+
+| Priorité | Sujet | Pourquoi |
+|----------|-------|-----------|
+| 🔴 | CI/CD GitHub Actions | Les vérifications passent en local mais ne sont pas encore automatisées |
+| 🔴 | Migration Auth Supabase | Le flux d'authentification reste hybride |
+| 🟡 | Documentation `.env` par application | Le démarrage du dépôt reste encore trop implicite |
+| 🟡 | Connexion complète des écrans mobile | Le socle Expo est prêt, mais les parcours métier restent à brancher |
 
 ---
 

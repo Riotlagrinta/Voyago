@@ -15,6 +15,7 @@
 <p align="center">
   <a href="#fonctionnalités">Fonctionnalités</a> •
   <a href="#état-actuel">État Actuel</a> •
+  <a href="#priorités-immédiates">Priorités</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#installation">Installation</a> •
   <a href="#stack-technique">Stack Technique</a> •
@@ -40,6 +41,7 @@ L'application permet la **réservation de tickets**, le **paiement en ligne** (T
 - Vérification TypeScript `mobile` validée
 - Tests `api` validés : `11/11`
 - Lint `web` validé
+- Dépôt synchronisé sur `main`
 
 ### Dernières mises à jour
 
@@ -47,6 +49,15 @@ L'application permet la **réservation de tickets**, le **paiement en ligne** (T
 - Ajout du typage global Express pour `req.user`
 - Réalignement du middleware d'authentification et du flux de réservation avec les tests
 - Stabilisation du rendu 3D et suppression des erreurs de lint bloquantes
+
+---
+
+## 🎯 Priorités Immédiates
+
+- Brancher les interfaces `web` et `mobile` sur les vraies données métier restantes
+- Finaliser la migration Supabase côté authentification, données et temps réel
+- Mettre en place la CI/CD pour automatiser `build`, `lint` et `tests`
+- Documenter précisément les variables d'environnement par application
 
 ---
 
@@ -247,6 +258,19 @@ graph LR
 - `mobile/` : application Expo / React Native
 - `docs/` : documentation projet
 
+### Vérifications rapides
+
+```bash
+# Web
+cd web && npm run lint && npm run build
+
+# API
+cd api && npm run build && npm test -- --runInBand
+
+# Mobile
+cd mobile && npx tsc --noEmit
+```
+
 ### Démarrage rapide
 
 ```bash
@@ -326,7 +350,7 @@ MAPBOX_ACCESS_TOKEN=pk.xxx
 
 ## 🤝 Contribution
 
-Les contributions sont les bienvenues ! Consultez le guide [CONTRIBUTING.md](docs/CONTRIBUTING.md) pour les détails.
+Les contributions sont possibles, mais le dépôt ne contient pas encore de guide dédié `CONTRIBUTING.md`. En attendant, travaille sur une branche courte, garde des commits lisibles et valide les commandes de vérification avant ouverture d'une PR.
 
 1. Fork le projet
 2. Crée ta branche (`git checkout -b feature/ma-fonctionnalite`)
@@ -357,9 +381,8 @@ Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus
 
 ## 📬 Contact
 
-- **Email** : contact@voyago.tg
-- **Site web** : [www.voyago.tg](https://www.voyago.tg)
-- **LinkedIn** : [Voyago Togo](https://linkedin.com/company/voyago-tg)
+- Les canaux publics de contact ne sont pas encore documentés dans le dépôt.
+- Ajouter ici l'email projet, le site vitrine et les liens sociaux lorsqu'ils seront réellement actifs.
 
 ---
 
