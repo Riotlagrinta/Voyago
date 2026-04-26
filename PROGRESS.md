@@ -1,7 +1,7 @@
 # ✅ Voyago — Suivi des Tâches
 
 > Dernière mise à jour : 2026-04-26
-> **Progression globale** : 15/85 tâches complétées (Migration Supabase lancée)
+> **Progression globale** : 20/85 tâches complétées (stabilisation technique et qualité validées)
 
 ---
 
@@ -13,6 +13,7 @@
 | ✅ | Création de la `ROADMAP.md` | 2026-04-15 |
 | ✅ | Création du `PROGRESS.md` (ce fichier) | 2026-04-15 |
 | ✅ | Stratégie Migration Supabase (`docs/SUPABASE_MIGRATION.md`) | 2026-04-26 |
+| ✅ | Relecture/correction orthographique dépôt applicatif | 2026-04-26 |
 
 ---
 
@@ -28,6 +29,11 @@
 | ✅ | 0.4 | Setup PostgreSQL + PostGIS (Supabase) | 2026-04-24 |
 | ⬜ | 0.5 | CI/CD (GitHub Actions) | |
 | ✅ | 0.6 | Variables d'environnement (`.env.example`) | 2026-04-15 |
+| ✅ | 0.7 | Build `web` validé | 2026-04-26 |
+| ✅ | 0.8 | Build `api` validé | 2026-04-26 |
+| ✅ | 0.9 | Lint `web` validé | 2026-04-26 |
+| ✅ | 0.10 | Vérification TypeScript `mobile` validée | 2026-04-26 |
+| ✅ | 0.11 | Tests `api` validés (`11/11`) | 2026-04-26 |
 
 ---
 
@@ -55,6 +61,8 @@
 | ✅ | 1.4 | Middleware auth (Old) | 2026-04-15 |
 | ✅ | 1.5 | CRUD profil utilisateur | 2026-04-15 |
 | ✅ | 1.6 | Validation téléphone Togo (+228) | 2026-04-15 |
+| ✅ | 1.7 | Typage global Express pour `req.user` | 2026-04-26 |
+| ✅ | 1.8 | Flux réservation aligné avec les tests | 2026-04-26 |
 
 ---
 
@@ -80,6 +88,18 @@
 | ⬜ | 4.18 | Déploiement API (Edge Functions) | |
 | ✅ | 4.19 | Base de données prod (Supabase) | 2026-04-26 |
 | ⬜ | 4.22 | Publication mobile (Play Store) | |
+
+---
+
+## ✅ Contrôle Qualité
+
+| Vérification | Statut | Date |
+|--------------|--------|------|
+| `web` - `npm run build` | ✅ | 2026-04-26 |
+| `web` - `npm run lint` | ✅ | 2026-04-26 |
+| `api` - `npm run build` | ✅ | 2026-04-26 |
+| `api` - `npm test -- --runInBand` | ✅ | 2026-04-26 |
+| `mobile` - `npx tsc --noEmit` | ✅ | 2026-04-26 |
 
 ---
 

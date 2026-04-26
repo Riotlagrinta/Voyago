@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  /* Fond et Texte - Harmonie Neutre (LuminositÃ© rÃ©duite pour l'accessibilitÃ©) */
+  /* Fond et texte - harmonie neutre (luminosité réduite pour l'accessibilité) */
   --background: #F1F5F9; /* Gris-bleu doux (Slate 100) au lieu de blanc pur */
-  --foreground: #0F172A; /* Slate 900 - Noir bleutÃ© doux */
+  --foreground: #0F172A; /* Slate 900 - Noir bleuté doux */
   
   /* Azure Premium Palette */
   --color-primary-50: #F0F9FF;
@@ -14,12 +14,12 @@
   --color-primary-700: #0369A1;
 
   /* Slate - La base de l'harmonie (bordures, cartes, textes secondaires) */
-  --color-surface-50: #F9FAFB; /* Blanc cassÃ© pour les cartes (Ã©vite l'Ã©blouissement) */
+  --color-surface-50: #F9FAFB; /* Blanc cassé pour les cartes (évite l'éblouissement) */
   --color-surface-100: #F1F5F9;
   --color-surface-200: #E2E8F0;
   --color-border: #E2E8F0;
 
-  /* SÃ©mantique */
+  /* Sémantique */
   --color-success: #10B981;
   --color-error: #EF4444;
   --color-warning: #F59E0B;
@@ -28,7 +28,7 @@
   --radius-2xl: 1rem;
 }
 
-/* Mode Sombre SupprimÃ© pour optimisation de l'accessibilitÃ© en Mode Clair Adouci */
+/* Mode sombre supprimé pour optimiser l'accessibilité en mode clair adouci */
 
 @theme inline {
   --color-background: var(--background);
@@ -60,7 +60,7 @@
   --radius-xl: var(--radius-xl);
   --radius-2xl: var(--radius-2xl);
 
-  /* Ombres harmonisÃ©es */
+  /* Ombres harmonisées */
   --shadow-voyago: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
 }
 
@@ -81,7 +81,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism harmonisÃ© */
+/* Glassmorphism harmonisé */
 .glass {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);

@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { useGpsTracking } from "@/hooks/useGpsTracking";
 
-// Import dynamique de la carte (Leaflet ne fonctionne que cÃ´tÃ© client)
+// Import dynamique de la carte (Leaflet ne fonctionne que côté client)
 const Map = dynamic(() => import('@/components/Map'), {
   ssr: false,
   loading: () => (
@@ -66,7 +66,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
 
         <div className="flex items-center gap-4">
           <div className="bg-primary/5 px-3 py-1 rounded-full border border-primary/10 hidden sm:block">
-            <p className="text-[9px] font-black text-primary/40 uppercase tracking-tighter text-right">Mise Ã  jour</p>
+            <p className="text-[9px] font-black text-primary/40 uppercase tracking-tighter text-right">Mise à jour</p>
             <p className="text-[10px] font-bold text-primary uppercase">{lastUpdate || '--:--'}</p>
           </div>
           <Badge variant={isConnected ? "success" : "warning"} className="py-1.5 px-4 text-sm font-black shadow-lg rounded-xl border-none">
@@ -93,7 +93,7 @@ export default function TrackingPage({ params }: TrackingPageProps) {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">Dernier Signal</p>
-                    <p className="text-sm font-bold text-foreground">{lastUpdate ? `Aujourd'hui Ã  ${lastUpdate}` : 'En attente...'}</p>
+                    <p className="text-sm font-bold text-foreground">{lastUpdate ? `Aujourd'hui à ${lastUpdate}` : 'En attente...'}</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -106,8 +106,8 @@ export default function TrackingPage({ params }: TrackingPageProps) {
                 <Zap className="w-5 h-5 text-primary animate-pulse" />
                 <p className="text-xs font-bold text-primary leading-tight">
                   {isPolling 
-                    ? "Mode rÃ©seau faible activÃ©. Actualisation toutes les 30s." 
-                    : "Signal optimal. Suivi en temps rÃ©el activÃ©."}
+                    ? "Mode réseau faible activé. Actualisation toutes les 30 s."
+                    : "Signal optimal. Suivi en temps réel activé."}
                 </p>
               </div>
             </motion.div>

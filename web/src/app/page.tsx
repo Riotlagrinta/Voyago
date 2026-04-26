@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -73,9 +74,9 @@ export default function Home() {
 
           {/* Navigation */}
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-foreground/70">
-            <a href="/search" className="hover:text-primary transition-colors">Trajets</a>
-            <a href="/compagnies" className="hover:text-primary transition-colors">Compagnies</a>
-            <a href="/contact" className="hover:text-primary transition-colors">Support</a>
+            <Link href="/search" className="hover:text-primary transition-colors">Trajets</Link>
+            <Link href="/compagnies" className="hover:text-primary transition-colors">Compagnies</Link>
+            <Link href="/contact" className="hover:text-primary transition-colors">Support</Link>
           </div>
 
           {/* Actions */}
@@ -111,12 +112,12 @@ export default function Home() {
               >
                 <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 mb-8">
                   <Zap className="w-3.5 h-3.5 text-primary fill-primary" />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Le transport rÃ©inventÃ© au Togo</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-primary">Le transport réinventé au Togo</span>
                 </div>
                 <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-[1.1] tracking-tight text-foreground">
                   Voyagez <br /><span className="text-primary">sans limites.</span>
                 </h1>
-                <p className="text-lg text-foreground/80 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed">RÃ©servez vos places de bus en toute sÃ©curitÃ© avec suivi GPS en temps rÃ©el.</p>
+                <p className="text-lg text-foreground/80 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed">Réservez vos places de bus en toute sécurité avec suivi GPS en temps réel.</p>
                 <div className="mt-10 flex flex-wrap justify-center lg:justify-start gap-4">
                    <Button size="lg" className="rounded-xl px-8 font-bold shadow-lg shadow-primary/25" onClick={() => router.push("/search")}>Trouver un trajet <ChevronRight className="ml-2 w-4 h-4" /></Button>
                    <Button variant="outline" size="lg" className="rounded-xl px-8 font-bold border-border" onClick={() => router.push("/about")}>En savoir plus</Button>
@@ -138,7 +139,7 @@ export default function Home() {
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
                   <div className="md:col-span-3">
                     <Input
-                      placeholder="DÃ©part"
+                      placeholder="Départ"
                       leftIcon={<MapPin className="text-primary w-5 h-5" />}
                       className="border-none bg-surface-100 rounded-xl h-14 font-semibold"
                       value={search.departure}
@@ -147,7 +148,7 @@ export default function Home() {
                   </div>
                   <div className="md:col-span-3">
                     <Input 
-                      placeholder="ArrivÃ©e"
+                      placeholder="Arrivée"
                       leftIcon={<MapPin className="text-primary w-5 h-5" />}
                       className="border-none bg-surface-100 rounded-xl h-14 font-semibold"
                       value={search.arrival}
@@ -176,9 +177,9 @@ export default function Home() {
         <section className="py-24 bg-surface-100">
           <div className="max-w-6xl mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <FeatureCard icon={ShieldCheck} title="SÃ©curitÃ©" description="Chauffeurs certifiÃ©s et bus gÃ©o-localisÃ©s." />
-              <FeatureCard icon={Clock} title="Temps RÃ©el" description="Ne ratez plus jamais votre car grÃ¢ce au suivi GPS." />
-              <FeatureCard icon={CreditCard} title="Mobile Money" description="Paiements sÃ©curisÃ©s via T-Money ou Flooz." />
+              <FeatureCard icon={ShieldCheck} title="Sécurité" description="Chauffeurs certifiés et bus géolocalisés." />
+              <FeatureCard icon={Clock} title="Temps réel" description="Ne ratez plus jamais votre car grâce au suivi GPS." />
+              <FeatureCard icon={CreditCard} title="Mobile Money" description="Paiements sécurisés via T-Money ou Flooz." />
             </div>
           </div>
         </section>
@@ -205,11 +206,11 @@ export default function Home() {
             <span className="text-lg font-bold text-foreground tracking-tight">Voyago</span>
           </div>
           <div className="flex gap-8 mb-8 text-sm font-semibold text-foreground/40">
-            <a href="/legal" className="hover:text-primary transition-colors">LÃ©gal</a>
-            <a href="/confidentialite" className="hover:text-primary transition-colors">Vie PrivÃ©e</a>
-            <a href="/cookies" className="hover:text-primary transition-colors">Cookies</a>
+            <Link href="/legal" className="hover:text-primary transition-colors">Légal</Link>
+            <Link href="/confidentialite" className="hover:text-primary transition-colors">Vie privée</Link>
+            <Link href="/cookies" className="hover:text-primary transition-colors">Cookies</Link>
           </div>
-          <p className="text-foreground/30 font-medium text-xs">Â© {new Date().getFullYear()} Voyago Togo. PropulsÃ© par la Tech.</p>
+          <p className="text-foreground/30 font-medium text-xs">© {new Date().getFullYear()} Voyago Togo. Propulsé par la tech.</p>
         </div>
       </footer>
     </div>

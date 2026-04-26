@@ -27,7 +27,7 @@ export function BusModel() {
         <meshStandardMaterial color="#2E382E" metalness={1} roughness={0} />
       </mesh>
 
-      {/* Vitres latÃ©rales */}
+      {/* Vitres latérales */}
       <mesh position={[0, 1.3, 1.01]}>
         <boxGeometry args={[3, 0.6, 0.02]} />
         <meshStandardMaterial color="#2E382E" metalness={1} roughness={0} />

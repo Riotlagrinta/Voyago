@@ -48,6 +48,11 @@ export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [showScanner, setShowScanner] = useState(false);
+  const [chartsReady, setChartsReady] = useState(false);
+
+  useEffect(() => {
+    setChartsReady(true);
+  }, []);
 
   useEffect(() => {
     const fetchGlobalStats = async () => {
@@ -139,24 +144,28 @@ export default function AdminOverview() {
             </div>
           </div>
           <div className="h-[340px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={[
-                { name: "Lun", res: 400 }, { name: "Mar", res: 550 }, { name: "Mer", res: 480 },
-                { name: "Jeu", res: 700 }, { name: "Ven", res: 950 }, { name: "Sam", res: 1100 }, { name: "Dim", res: 850 }
-              ]}>
-                <defs>
-                  <linearGradient id="colorRes" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#50C9CE" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#50C9CE" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 700}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 700}} />
-                <Tooltip />
-                <Area type="monotone" dataKey="res" stroke="#50C9CE" strokeWidth={4} fillOpacity={1} fill="url(#colorRes)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            {chartsReady ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={[
+                  { name: "Lun", res: 400 }, { name: "Mar", res: 550 }, { name: "Mer", res: 480 },
+                  { name: "Jeu", res: 700 }, { name: "Ven", res: 950 }, { name: "Sam", res: 1100 }, { name: "Dim", res: 850 }
+                ]}>
+                  <defs>
+                    <linearGradient id="colorRes" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#50C9CE" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="#50C9CE" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 700}} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 700}} />
+                  <Tooltip />
+                  <Area type="monotone" dataKey="res" stroke="#50C9CE" strokeWidth={4} fillOpacity={1} fill="url(#colorRes)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full w-full rounded-3xl bg-slate-50" />
+            )}
           </div>
         </Card>
 
@@ -164,16 +173,20 @@ export default function AdminOverview() {
         <Card className="p-10 border-none shadow-voyago rounded-[2.5rem] bg-white h-[500px] flex flex-col">
           <h3 className="text-xl font-black mb-10">Popularité des Compagnies</h3>
           <div className="flex-1 w-full flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie data={data} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={8} dataKey="value">
-                  {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {chartsReady ? (
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie data={data} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={8} dataKey="value">
+                    {data.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[260px] w-full rounded-3xl bg-slate-50" />
+            )}
           </div>
           <div className="space-y-4 mt-8">
             {data.map((entry, index) => (

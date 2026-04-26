@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     template: "%s | Voyago",
-    default: "Voyago â€” Plateforme de Transport Routier au Togo",
+    default: "Voyago - Plateforme de transport routier au Togo",
   },
-  description: "RÃ©servez vos places de bus en toute sÃ©curitÃ© partout au Togo. Payez par T-Money ou Flooz.",
+  description: "Réservez vos places de bus en toute sécurité partout au Togo. Payez par T-Money ou Flooz.",
 };
 
 export default function RootLayout({

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { pool } from '../lib/prisma';
 
 export const getSchedules = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  // MODE MOCK POUR DÃ‰MO
+  // MODE MOCK POUR DÉMO
   const mockSchedules = [
     {
       id: "s1",
@@ -10,7 +10,7 @@ export const getSchedules = async (req: Request, res: Response, next: NextFuncti
       price: "8500",
       availableSeats: 12,
       route: {
-        departureStation: { name: "Gare AgbalÃ©pÃ©dogan", city: "LomÃ©" },
+        departureStation: { name: "Gare Agbalépédogan", city: "Lomé" },
         arrivalStation: { name: "Gare Centrale", city: "Kara" },
         durationMin: 420
       },
@@ -23,8 +23,8 @@ export const getSchedules = async (req: Request, res: Response, next: NextFuncti
       price: "7000",
       availableSeats: 4,
       route: {
-        departureStation: { name: "Gare AgbalÃ©pÃ©dogan", city: "LomÃ©" },
-        arrivalStation: { name: "Gare Sud", city: "AtakpamÃ©" },
+        departureStation: { name: "Gare Agbalépédogan", city: "Lomé" },
+        arrivalStation: { name: "Gare Sud", city: "Atakpamé" },
         durationMin: 180
       },
       bus: { plateNumber: "TG 1122 BZ", type: "Standard" },
@@ -39,7 +39,7 @@ export const getSchedules = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const getScheduleById = async (req: Request, res: Response): Promise<void> => {
-   res.json({ success: true, data: { id: req.params.id, price: "8500", company: { name: "Voyago" }, bus: { capacity: 50 }, route: { departureStation: { city: "LomÃ©" }, arrivalStation: { city: "Kara" } } } });
+   res.json({ success: true, data: { id: req.params.id, price: "8500", company: { name: "Voyago" }, bus: { capacity: 50 }, route: { departureStation: { city: "Lomé" }, arrivalStation: { city: "Kara" } } } });
 };
 
 export const getScheduleSeats = async (req: Request, res: Response): Promise<void> => {
@@ -52,7 +52,7 @@ export const getScheduleSeats = async (req: Request, res: Response): Promise<voi
 };
 
 /**
- * RÃ©cupÃ¨re la derniÃ¨re position GPS connue d'un trajet (Polling Fallback)
+ * Récupère la dernière position GPS connue d'un trajet (polling fallback)
  */
 export const getLatestScheduleLocation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
@@ -75,7 +75,7 @@ export const getLatestScheduleLocation = async (req: Request, res: Response, nex
     if (result.rows.length === 0) {
       res.status(404).json({
         success: false,
-        message: "Aucune position trouvÃ©e pour ce trajet"
+        message: "Aucune position trouvée pour ce trajet"
       });
       return;
     }

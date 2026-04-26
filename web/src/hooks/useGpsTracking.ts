@@ -17,7 +17,7 @@ interface GpsTrackingState {
 
 export function useGpsTracking(scheduleId: string) {
   const [state, setState] = useState<GpsTrackingState>({
-    position: [6.1256, 1.2254], // LomÃ© par dÃ©faut
+    position: [6.1256, 1.2254], // Lomé par défaut
     speed: 0,
     lastUpdate: null,
     isConnected: false,
@@ -54,11 +54,11 @@ export function useGpsTracking(scheduleId: string) {
     socketRef.current = socket;
 
     socket.on('connect', () => {
-      console.log("[useGpsTracking] Socket connectÃ©");
+      console.log("[useGpsTracking] Socket connecté");
       socket.emit('join_trip', scheduleId);
       setState(prev => ({ ...prev, isConnected: true, isPolling: false }));
       
-      // Arreter le polling si le socket revient
+      // Arrêter le polling si le socket revient
       if (pollingRef.current) {
         clearInterval(pollingRef.current);
         pollingRef.current = null;
@@ -76,12 +76,12 @@ export function useGpsTracking(scheduleId: string) {
     });
 
     socket.on('disconnect', () => {
-      console.log("[useGpsTracking] Socket dÃ©connectÃ©, passage en mode Polling");
+      console.log("[useGpsTracking] Socket déconnecté, passage en mode polling");
       setState(prev => ({ ...prev, isConnected: false }));
       
-      // DÃ©marrer le polling
+      // Démarrer le polling
       if (!pollingRef.current) {
-        fetchLocation(); // Premier appel immÃ©diat
+        fetchLocation(); // Premier appel immédiat
         pollingRef.current = setInterval(fetchLocation, POLLING_INTERVAL);
       }
     });

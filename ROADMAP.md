@@ -1,6 +1,6 @@
 # 🗺️ Roadmap Voyago — Plateforme de Transport Routier au Togo
 
-> **Durée totale estimée** : 18 semaines (MVP) · **Stack** : Next.js 15 + Node.js/TS + PostgreSQL/PostGIS + Expo
+> **Durée totale estimée** : 18 semaines (MVP) · **Stack** : Next.js 16 + Node.js/TS + PostgreSQL/PostGIS + Expo
 
 ---
 
@@ -39,6 +39,16 @@ gantt
     Tests & Optimisations         :p4b, after p3d, 5d
     Déploiement Production        :p4c, after p4b, 3d
 ```
+
+---
+
+## État au 2026-04-26
+
+- Le dépôt est actuellement stable sur les vérifications locales principales :
+- `web` : build et lint validés
+- `api` : build et tests validés
+- `mobile` : vérification TypeScript validée
+- La feuille de route ci-dessous reste la cible produit, mais une partie du travail récent a porté sur la stabilisation technique, la correction de l'orthographe et l'alignement des tests.
 
 ---
 

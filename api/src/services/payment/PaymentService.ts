@@ -6,25 +6,25 @@ import { QRService } from '../booking/QRService';
 
 export class PaymentService {
   /**
-   * Traite un paiement pour une rÃ©servation
+   * Traite un paiement pour une réservation
    */
   static async processBookingPayment(bookingId: string, method: PaymentMethod, phoneNumber: string) {
     try {
-      // 1. RÃ©cupÃ©rer la rÃ©servation
+      // 1. Récupérer la réservation
       const booking = await prisma.booking.findUnique({
         where: { id: bookingId },
         include: { schedule: true }
       });
 
       if (!booking) {
-        throw new Error('RÃ©servation introuvable');
+        throw new Error('Réservation introuvable');
       }
 
       if (booking.status === BookingStatus.confirmed) {
-        throw new Error('Cette rÃ©servation est dÃ©jÃ  confirmÃ©e');
+        throw new Error('Cette réservation est déjà confirmée');
       }
 
-      // 2. CrÃ©er l'enregistrement de paiement initial
+      // 2. Créer l'enregistrement de paiement initial
       const payment = await prisma.payment.create({
         data: {
           bookingId: booking.id,
@@ -44,13 +44,13 @@ export class PaymentService {
         currency: 'XOF',
         phoneNumber: phoneNumber,
         method: method,
-        description: `Voyago - RÃ©servation #${booking.id}`,
+        description: `Voyago - Réservation #${booking.id}`,
         metadata: { bookingId: booking.id, paymentId: payment.id }
       };
 
       const response = await provider.initiatePayment(paymentRequest);
 
-      // 5. Mettre Ã  jour le paiement avec la rÃ©ponse du provider
+      // 5. Mettre à jour le paiement avec la réponse du provider
       const updatedPayment = await prisma.payment.update({
         where: { id: payment.id },
         data: {
@@ -60,7 +60,7 @@ export class PaymentService {
         }
       });
 
-      // 6. Gestion des rÃ©sultats
+      // 6. Gestion des résultats
       if (response.status === PaymentStatus.completed) {
         const qrCode = QRService.generateTicketData(bookingId);
 
@@ -72,14 +72,14 @@ export class PaymentService {
           }
         });
 
-        console.log(`[PaymentService] RÃ©servation ${bookingId} confirmÃ©e.`);
+        console.log(`[PaymentService] Réservation ${bookingId} confirmée.`);
       } else if (response.status === PaymentStatus.failed) {
-        // En cas d'Ã©chec explicite du provider
+        // En cas d'échec explicite du provider
         await prisma.booking.update({
           where: { id: bookingId },
           data: { status: BookingStatus.pending } // On garde en pending pour permettre un retry
         });
-        throw new Error(response.message || 'Le paiement a Ã©chouÃ© auprÃ¨s du fournisseur');
+        throw new Error(response.message || 'Le paiement a échoué auprès du fournisseur');
       }
 
       return {
@@ -105,11 +105,11 @@ export class PaymentService {
       });
 
       if (!payment || !payment.reference) {
-        throw new Error('Paiement introuvable ou non rÃ©fÃ©rencÃ©');
+        throw new Error('Paiement introuvable ou non référencé');
       }
 
       if (payment.status === PaymentStatus.refunded) {
-        throw new Error('Ce paiement a dÃ©jÃ  Ã©tÃ© remboursÃ©');
+        throw new Error('Ce paiement a déjà été remboursé');
       }
 
       const provider = PaymentFactory.getProvider(payment.method);
@@ -126,7 +126,7 @@ export class PaymentService {
           data: { status: BookingStatus.cancelled }
         });
 
-        console.log(`[PaymentService] Paiement ${paymentId} remboursÃ© et rÃ©servation annulÃ©e.`);
+        console.log(`[PaymentService] Paiement ${paymentId} remboursé et réservation annulée.`);
       }
 
       return response;
@@ -137,7 +137,7 @@ export class PaymentService {
   }
 
   /**
-   * VÃ©rifie et synchronise le statut d'un paiement
+   * Vérifie et synchronise le statut d'un paiement
    */
   static async syncPaymentStatus(paymentId: string) {
     const payment = await prisma.payment.findUnique({

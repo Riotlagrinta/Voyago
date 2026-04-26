@@ -20,7 +20,7 @@ export default function Map3D({ position, busName }: Map3DProps) {
     longitude: position[0],
     latitude: position[1],
     zoom: 17, // Plus proche pour l'immersion
-    pitch: 70, // Angle trÃ¨s inclinÃ© pour voir les bÃ¢timents
+    pitch: 70, // Angle très incliné pour voir les bâtiments
     bearing: 0
   });
 
@@ -42,7 +42,7 @@ export default function Map3D({ position, busName }: Map3DProps) {
       const bearing = calculateBearing(prevPos.current, position);
       setBusRotation(bearing);
 
-      // Mode Follow CinÃ©matique : La camÃ©ra suit le bus avec fluiditÃ©
+      // Mode follow cinématique : la caméra suit le bus avec fluidité
       if (followMode && mapRef.current) {
         mapRef.current.easeTo({
           center: position,
@@ -57,7 +57,7 @@ export default function Map3D({ position, busName }: Map3DProps) {
 
   const lightStyle = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
 
-  // Configuration des bÃ¢timents 3D (Couche d'extrusion)
+  // Configuration des bâtiments 3D (couche d'extrusion)
   const buildingLayer: any = {
     id: '3d-buildings',
     source: 'openmaptiles',
@@ -82,14 +82,14 @@ export default function Map3D({ position, busName }: Map3DProps) {
         style={{ width: '100%', height: '100%' }}
         maxPitch={85}
       >
-        {/* Effet de Ciel (AtmosphÃ¨re) */}
+        {/* Effet de ciel (atmosphère) */}
         <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000 bg-gradient-to-b from-sky-400/20 to-transparent" />
 
         <Source id="openmaptiles" type="vector" url="https://api.maptiler.com/tiles/v3/tiles.json?key=get_your_own_key">
             <Layer {...buildingLayer} />
         </Source>
 
-        {/* ContrÃ´les Custom "Premium" */}
+        {/* Contrôles personnalisés */}
         <div className="absolute bottom-10 left-10 z-10 flex flex-col gap-4">
           <button
             onClick={() => setFollowMode(!followMode)}
@@ -102,12 +102,12 @@ export default function Map3D({ position, busName }: Map3DProps) {
           </div>
         </div>
 
-        {/* Bus 3D CinÃ©matique */}
+        {/* Bus 3D cinématique */}
         <Marker longitude={position[0]} latitude={position[1]} anchor="center">
           <div style={{
             width: '140px',
             height: '140px',
-            transform: `rotate(${-busRotation + viewState.bearing}deg)`, // Ajustement par rapport Ã  la rotation de la carte
+            transform: `rotate(${-busRotation + viewState.bearing}deg)`, // Ajustement par rapport à la rotation de la carte
             transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
           }}>
             <Canvas camera={{ position: [5, 5, 5], fov: 35 }}>

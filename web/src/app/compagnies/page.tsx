@@ -58,7 +58,7 @@ export default function CompaniesPage() {
             </div>
             <span className="text-xl font-bold tracking-tight text-foreground">Voyago</span>
           </div>
-          <Button variant="ghost" size="sm" className="font-bold text-foreground/60 hover:text-primary" onClick={() => router.push("/")}>Retour Ã  l'accueil</Button>
+          <Button variant="ghost" size="sm" className="font-bold text-foreground/60 hover:text-primary" onClick={() => router.push("/")}>Retour à l'accueil</Button>
         </div>
       </nav>
 
@@ -71,14 +71,14 @@ export default function CompaniesPage() {
           <h1 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-foreground">Nos Compagnies <br /><span className="text-primary">Partenaires</span></h1>
           <p className="text-foreground/50 max-w-xl mx-auto font-medium leading-relaxed">
             Nous collaborons avec les meilleures compagnies de transport au Togo
-            pour vous garantir un voyage sÃ»r, confortable et ponctuel.
+            pour vous garantir un voyage sûr, confortable et ponctuel.
           </p>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Loader2 className="w-12 h-12 animate-spin text-primary mb-6" />
-            <p className="font-black text-[10px] uppercase tracking-[0.2em] text-foreground/30">Analyse du rÃ©seau...</p>
+            <p className="font-black text-[10px] uppercase tracking-[0.2em] text-foreground/30">Analyse du réseau...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -126,7 +126,7 @@ export default function CompaniesPage() {
                   <div className="space-y-4 mb-10">
                     <div className="flex items-center gap-3 text-xs font-bold text-foreground/60 bg-surface-100 px-4 py-2.5 rounded-xl w-fit">
                       <MapPin className="w-4 h-4 text-primary" />
-                      {company.address || "LomÃ©, Togo"}
+                      {company.address || "Lomé, Togo"}
                     </div>
                     <div className="flex items-center gap-3 text-xs font-bold text-foreground/60 bg-surface-100 px-4 py-2.5 rounded-xl w-fit">
                       <Phone className="w-4 h-4 text-primary" />

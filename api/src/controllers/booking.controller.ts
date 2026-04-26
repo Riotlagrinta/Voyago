@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { TicketPDFService } from '../services/booking/TicketPDFService';
 import { NotificationService } from '../services/notification/NotificationService';
+import { prisma } from '../lib/prisma';
+import { createError } from '../middlewares/error.middleware';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'voyago-super-secret-key';
 
@@ -45,9 +47,56 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
   console.log(">>> CRÉATION RÉSERVATION (MODE DÉMO)");
   
   try {
-    const { scheduleId, seats } = req.body;
+    const { scheduleId, seats, seatId } = req.body;
 
-    if (!scheduleId || !seats || !Array.isArray(seats)) {
+    if (!scheduleId) {
+      return res.status(400).json({ success: false, message: "Données invalides" });
+    }
+
+    if (seatId) {
+      if (!req.user) {
+        return next(createError('Non authentifié', 401));
+      }
+
+      const schedule = await prisma.schedule.findUnique({ where: { id: scheduleId } });
+      const seat = await prisma.seat.findUnique({ where: { id: seatId } });
+
+      if (!schedule || !seat) {
+        return res.status(400).json({ success: false, message: "Données invalides" });
+      }
+
+      const existingBooking = await prisma.booking.findFirst({
+        where: {
+          scheduleId,
+          seatId,
+          status: { in: ['pending', 'confirmed'] },
+        },
+      });
+
+      if (existingBooking) {
+        return res.status(409).json({ success: false, error: "Ce siège est déjà réservé." });
+      }
+
+      const lockedUntil = new Date(Date.now() + 10 * 60 * 1000);
+      const booking = await prisma.booking.create({
+        data: {
+          userId: req.user.id,
+          scheduleId,
+          seatId,
+          seatNumber: seat.seatNumber,
+          status: 'pending',
+          totalPrice: Number(schedule.price),
+          lockedUntil,
+        },
+      });
+
+      return res.status(201).json({
+        success: true,
+        data: booking,
+      });
+    }
+
+    if (!seats || !Array.isArray(seats)) {
       return res.status(400).json({ success: false, message: "Données invalides" });
     }
 
@@ -128,7 +177,16 @@ export const getBookingById = async (req: Request, res: Response) => {
 };
 
 export const getBookings = async (req: Request, res: Response) => {
-  res.json({ success: true, data: [] });
+  if (!req.user) {
+    res.status(401).json({ success: false, error: "Non authentifié" });
+    return;
+  }
+
+  const bookings = await prisma.booking.findMany({
+    where: { userId: req.user.id }
+  });
+
+  res.json({ success: true, data: bookings });
 };
 
 export const cancelBooking = async (req: Request, res: Response) => {

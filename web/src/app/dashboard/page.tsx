@@ -43,6 +43,11 @@ export default function DashboardOverview() {
   const { user } = useAuthStore();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [chartsReady, setChartsReady] = useState(false);
+
+  useEffect(() => {
+    setChartsReady(true);
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -145,41 +150,45 @@ export default function DashboardOverview() {
             </select>
           </div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--color-primary-600)" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="var(--color-primary-600)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} 
-                  dy={10}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
-                  tickFormatter={(value) => `${value / 1000}k`}
-                />
-                <Tooltip 
-                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: 'var(--shadow-voyago)', fontWeight: 'bold'}}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="total" 
-                  stroke="var(--color-primary-600)" 
-                  strokeWidth={4}
-                  fillOpacity={1} 
-                  fill="url(#colorTotal)" 
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {chartsReady ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-primary-600)" stopOpacity={0.1}/>
+                      <stop offset="95%" stopColor="var(--color-primary-600)" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}} 
+                    dy={10}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{fill: '#94a3b8', fontSize: 12, fontWeight: 600}}
+                    tickFormatter={(value) => `${value / 1000}k`}
+                  />
+                  <Tooltip 
+                    contentStyle={{borderRadius: '16px', border: 'none', boxShadow: 'var(--shadow-voyago)', fontWeight: 'bold'}}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="total" 
+                    stroke="var(--color-primary-600)" 
+                    strokeWidth={4}
+                    fillOpacity={1} 
+                    fill="url(#colorTotal)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full w-full rounded-3xl bg-slate-50" />
+            )}
           </div>
         </Card>
 

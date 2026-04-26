@@ -7,11 +7,11 @@ import { Text, View } from '@/components/Themed';
 export default function ModalScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
+      <Text style={styles.title}>Informations</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <EditScreenInfo path="app/modal.tsx" />
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
+      {/* Utilise une barre d'état claire sur iOS pour compenser l'espace noir au-dessus de la fenêtre modale */}
       <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
     </View>
   );

@@ -14,6 +14,7 @@
 
 <p align="center">
   <a href="#fonctionnalités">Fonctionnalités</a> •
+  <a href="#état-actuel">État Actuel</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#installation">Installation</a> •
   <a href="#stack-technique">Stack Technique</a> •
@@ -29,6 +30,23 @@
 L'application permet la **réservation de tickets**, le **paiement en ligne** (T-Money, Flooz), le **suivi des bus en temps réel** et l'**optimisation des opérations** pour les transporteurs.
 
 > **Mission** : Moderniser le secteur du transport routier togolais pour améliorer l'expérience des voyageurs et augmenter les revenus des transporteurs.
+
+---
+
+## 📌 État Actuel
+
+- Build `web` validé
+- Build `api` validé
+- Vérification TypeScript `mobile` validée
+- Tests `api` validés : `11/11`
+- Lint `web` validé
+
+### Dernières mises à jour
+
+- Correction des fautes d'orthographe, libellés et problèmes d'encodage sur l'application et la documentation active
+- Ajout du typage global Express pour `req.user`
+- Réalignement du middleware d'authentification et du flux de réservation avec les tests
+- Stabilisation du rendu 3D et suppression des erreurs de lint bloquantes
 
 ---
 
@@ -120,7 +138,7 @@ voyago/
 ### Frontend (Web)
 | Technologie | Rôle |
 |-------------|------|
-| **Next.js 15** | Framework React (App Router, SSR) |
+| **Next.js 16** | Framework React (App Router, SSR) |
 | **TypeScript** | Typage statique |
 | **Tailwind CSS** | Styling utilitaire |
 | **Framer Motion** | Animations & transitions |
@@ -221,6 +239,13 @@ graph LR
 - **npm** >= 9.x ou **pnpm** >= 8.x
 - **PostgreSQL** >= 15 avec PostGIS
 - **Git**
+
+### Monorepo
+
+- `web/` : application Next.js
+- `api/` : API Express + TypeScript
+- `mobile/` : application Expo / React Native
+- `docs/` : documentation projet
 
 ### Démarrage rapide
 

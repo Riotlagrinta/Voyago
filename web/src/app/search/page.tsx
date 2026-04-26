@@ -68,7 +68,7 @@ function SearchResultsContent() {
         });
         setSchedules(response.data.data || []);
       } catch (err) {
-        setError("Impossible de charger les trajets. RÃ©essayez plus tard.");
+        setError("Impossible de charger les trajets. Réessayez plus tard.");
       } finally {
         setLoading(false);
       }
@@ -96,13 +96,13 @@ function SearchResultsContent() {
           <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-2 w-full">
             <Input
               defaultValue={departure || ""}
-              placeholder="DÃ©part"
+              placeholder="Départ"
               leftIcon={<MapPin className="text-primary w-4 h-4" />}
               className="h-10 border-none bg-surface-100"
             />
             <Input
               defaultValue={arrival || ""}
-              placeholder="ArrivÃ©e"
+              placeholder="Arrivée"
               leftIcon={<MapPin className="text-primary w-4 h-4" />}
               className="h-10 border-none bg-surface-100"
             />
@@ -129,13 +129,13 @@ function SearchResultsContent() {
             </h3>
             <div className="space-y-4">
               <div className="bg-surface p-5 rounded-2xl border border-border/50 shadow-voyago">
-                <label className="text-[10px] font-black uppercase text-foreground/30 mb-4 block tracking-widest">Heure de dÃ©part</label>
+                <label className="text-[10px] font-black uppercase text-foreground/30 mb-4 block tracking-widest">Heure de départ</label>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 text-sm font-bold text-foreground/60 cursor-pointer hover:text-primary transition-colors">
                     <input type="checkbox" className="w-4 h-4 rounded-lg border-border text-primary focus:ring-primary/20 transition-all" /> Matin (05:00 - 12:00)
                   </label>
                   <label className="flex items-center gap-3 text-sm font-bold text-foreground/60 cursor-pointer hover:text-primary transition-colors">
-                    <input type="checkbox" className="w-4 h-4 rounded-lg border-border text-primary focus:ring-primary/20 transition-all" /> AprÃ¨s-midi (12:00 - 18:00)
+                    <input type="checkbox" className="w-4 h-4 rounded-lg border-border text-primary focus:ring-primary/20 transition-all" /> Après-midi (12:00 - 18:00)
                   </label>
                   <label className="flex items-center gap-3 text-sm font-bold text-foreground/60 cursor-pointer hover:text-primary transition-colors">
                     <input type="checkbox" className="w-4 h-4 rounded-lg border-border text-primary focus:ring-primary/20 transition-all" /> Soir (18:00 - 00:00)
@@ -159,12 +159,12 @@ function SearchResultsContent() {
         <div className="lg:col-span-3 space-y-4">
           <div className="flex justify-between items-center mb-6 px-2">
             <h2 className="text-lg font-bold text-foreground/80">
-              {loading ? "Recherche..." : <><span className="text-primary">{schedules.length}</span> trajets trouvÃ©s</>}
+              {loading ? "Recherche..." : <><span className="text-primary">{schedules.length}</span> trajets trouvés</>}
             </h2>
             <select className="bg-surface border border-border/50 rounded-xl px-4 py-2 text-xs font-bold text-foreground/60 outline-none focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer">
               <option>Le moins cher</option>
               <option>Le plus rapide</option>
-              <option>Le plus tÃ´t</option>
+              <option>Le plus tôt</option>
             </select>
           </div>
 
@@ -202,7 +202,7 @@ function SearchResultsContent() {
                       <Badge variant="default" className="bg-transparent text-foreground/40 font-mono text-[10px] font-bold py-1 px-3 border border-border/50">{schedule.bus.plateNumber}</Badge>
                       {schedule.company.certified && (
                         <div className="ml-auto flex items-center gap-1.5 text-[10px] font-black uppercase text-blue-500 bg-blue-500/5 px-3 py-1.5 rounded-lg border border-blue-500/10">
-                          <ShieldCheck className="w-3.5 h-3.5 fill-blue-500 text-white" /> CertifiÃ©e
+                          <ShieldCheck className="w-3.5 h-3.5 fill-blue-500 text-white" /> Certifiée
                         </div>
                       )}
                     </div>
@@ -245,7 +245,7 @@ function SearchResultsContent() {
                   {/* Price Right */}
                   <div className="bg-surface-50 md:w-72 p-10 flex flex-col justify-center items-center md:border-l border-border/50 gap-6">  
                     <div className="text-center">
-                      <span className="text-[10px] font-black uppercase text-foreground/30 block mb-2 tracking-[0.2em]">Prix par siÃ¨ge</span>
+                      <span className="text-[10px] font-black uppercase text-foreground/30 block mb-2 tracking-[0.2em]">Prix par siège</span>
                       <span className="text-4xl font-black text-primary tracking-tighter">
                         {parseInt(schedule.price || "0").toLocaleString("fr-FR")} <span className="text-sm">F</span>
                       </span>
@@ -254,10 +254,10 @@ function SearchResultsContent() {
                       className="w-full rounded-2xl py-6 h-auto text-md font-black uppercase tracking-wider group-hover:scale-[1.02] transition-all shadow-lg shadow-primary/20 active:scale-95"
                       onClick={() => handleBook(schedule.id)}
                     >
-                      RÃ©server <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+                      Réserver <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </Button>
                     <p className="text-[10px] font-bold text-foreground/30 text-center leading-relaxed">
-                      Confirmation instantanÃ©e par SMS <br /> aprÃ¨s paiement sÃ©curisÃ©
+                      Confirmation instantanée par SMS <br /> après paiement sécurisé
                     </p>
                   </div>
                 </div>

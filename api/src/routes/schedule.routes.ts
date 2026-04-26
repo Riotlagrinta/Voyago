@@ -14,7 +14,7 @@ router.get('/:id', getScheduleById);
 router.get('/:id/seats', getScheduleSeats);
 router.get('/:id/location', getLatestScheduleLocation); // Fallback Polling
 
-// ProtÃ©gÃ© â€” company_admin
+// Protégé - company_admin
 router.post('/', authenticate, authorize('company_admin', 'super_admin'), createSchedule);
 router.put('/:id', authenticate, authorize('company_admin', 'super_admin'), updateSchedule);
 router.delete('/:id', authenticate, authorize('company_admin', 'super_admin'), deleteSchedule);
