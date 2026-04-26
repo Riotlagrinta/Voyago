@@ -1,0 +1,19 @@
+{
+  "name": "voyago",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plateforme digitale de transport routier au Togo",
+  "scripts": {
+    "dev:web": "cd web && npm run dev",
+    "dev:api": "cd api && npm run dev",
+    "build:web": "cd web && npm run build",
+    "build:api": "cd api && npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0"
+  }
+}

@@ -1,0 +1,340 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  passenger
+  company_admin
+  driver
+  super_admin
+
+  @@map("user_role")
+}
+
+enum CompanyStatus {
+  pending
+  active
+  suspended
+
+  @@map("company_status")
+}
+
+enum BusType {
+  standard
+  vip
+  climatise
+  minibus
+
+  @@map("bus_type")
+}
+
+enum BusStatus {
+  active
+  maintenance
+  inactive
+
+  @@map("bus_status")
+}
+
+enum SeatType {
+  standard
+  vip
+
+  @@map("seat_type")
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+
+  @@map("booking_status")
+}
+
+enum PaymentMethod {
+  tmoney
+  flooz
+  cash
+
+  @@map("payment_method")
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+
+  @@map("payment_status")
+}
+
+model User {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(150)
+  phone         String?   @unique @db.VarChar(20)
+  passwordHash  String    @map("password_hash")
+  role          UserRole  @default(passenger)
+  avatarUrl     String?   @map("avatar_url")
+  isActive      Boolean   @default(true) @map("is_active")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  companies Company[]
+  bookings  Booking[]
+  drivers   Driver[]
+  reviews   Review[]
+
+  @@map("users")
+}
+
+model Company {
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String        @db.VarChar(150)
+  slug        String        @unique @db.VarChar(150)
+  logoUrl     String?       @map("logo_url")
+  bannerUrl   String?       @map("banner_url")
+  themeColor  String?       @default("#50C9CE") @map("theme_color") @db.VarChar(7)
+  slogan      String?       @db.VarChar(200)
+  description String?
+  phone       String?       @db.VarChar(20)
+  email       String?       @db.VarChar(150)
+  address     String?
+  city        String?       @db.VarChar(100)
+  status      CompanyStatus @default(pending)
+  certified   Boolean       @default(false)
+  adminId     String        @map("admin_id") @db.Uuid
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  admin      User             @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  gallery    CompanyGallery[]
+  buses      Bus[]
+  drivers    Driver[]
+  routes     Route[]
+  reviews    Review[]
+
+  @@map("companies")
+}
+
+model CompanyGallery {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  companyId    String   @map("company_id") @db.Uuid
+  imageUrl     String   @map("image_url")
+  caption      String?  @db.VarChar(200)
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_gallery")
+}
+
+model Bus {
+  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  companyId       String      @map("company_id") @db.Uuid
+  plateNumber     String      @unique @map("plate_number") @db.VarChar(20)
+  name            String?     @db.VarChar(100)
+  type            BusType     @default(standard)
+  capacity        Int
+  status          BusStatus   @default(active)
+  photoUrl        String?     @map("photo_url")
+  amenities       String[]
+  manufactureYear Int?        @map("manufacture_year")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  seats     Seat[]
+  schedules Schedule[]
+
+  @@map("buses")
+}
+
+model Seat {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  busId      String   @map("bus_id") @db.Uuid
+  seatNumber Int      @map("seat_number")
+  type       SeatType @default(standard)
+  rowPos     Int      @map("row_pos")
+  colPos     Int      @map("col_pos")
+
+  bus      Bus       @relation(fields: [busId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@unique([busId, seatNumber])
+  @@map("seats")
+}
+
+model Driver {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String?   @map("user_id") @db.Uuid
+  companyId       String    @map("company_id") @db.Uuid
+  name            String    @db.VarChar(100)
+  phone           String    @db.VarChar(20)
+  licenseNumber   String    @unique @map("license_number") @db.VarChar(50)
+  licenseExpiry   DateTime  @map("license_expiry") @db.Date
+  experienceYears Int       @default(0) @map("experience_years")
+  photoUrl        String?   @map("photo_url")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  company   Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  schedules Schedule[]
+
+  @@map("drivers")
+}
+
+model Station {
+  id        String                                  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name      String                                  @db.VarChar(150)
+  city      String                                  @db.VarChar(100)
+  address   String?
+  location  Unsupported("geography(Point, 4326)")?
+  createdAt DateTime                                @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  departureRoutes Route[] @relation("DepartureStation")
+  arrivalRoutes   Route[] @relation("ArrivalStation")
+  routeStops      RouteStop[]
+
+  @@map("stations")
+}
+
+model Route {
+  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  companyId          String    @map("company_id") @db.Uuid
+  departureStationId String    @map("departure_station_id") @db.Uuid
+  arrivalStationId   String    @map("arrival_station_id") @db.Uuid
+  distanceKm         Decimal?  @map("distance_km") @db.Decimal(8, 2)
+  durationMin        Int?      @map("duration_min")
+  isActive           Boolean   @default(true) @map("is_active")
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  company          Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  departureStation Station    @relation("DepartureStation", fields: [departureStationId], references: [id])
+  arrivalStation   Station    @relation("ArrivalStation", fields: [arrivalStationId], references: [id])
+  schedules        Schedule[]
+  stops            RouteStop[]
+
+  @@map("routes")
+}
+
+model RouteStop {
+  id                    String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  routeId               String   @map("route_id") @db.Uuid
+  stationId             String   @map("station_id") @db.Uuid
+  stopOrder             Int      @map("stop_order")
+  arrivalTimeOffsetMin  Int?     @map("arrival_time_offset_min")
+  departureTimeOffsetMin Int?    @map("departure_time_offset_min")
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  route   Route   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  station Station @relation(fields: [stationId], references: [id])
+
+  @@unique([routeId, stationId])
+  @@unique([routeId, stopOrder])
+  @@map("route_stops")
+}
+
+model Schedule {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  routeId        String    @map("route_id") @db.Uuid
+  busId          String    @map("bus_id") @db.Uuid
+  driverId       String?   @map("driver_id") @db.Uuid
+  departureTime  DateTime  @map("departure_time") @db.Timestamptz(6)
+  arrivalTime    DateTime? @map("arrival_time") @db.Timestamptz(6)
+  price          Decimal   @db.Decimal(10, 2)
+  availableSeats Int       @map("available_seats")
+  status         String    @default("scheduled") @db.VarChar(20)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  route        Route         @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  bus          Bus           @relation(fields: [busId], references: [id])
+  driver       Driver?       @relation(fields: [driverId], references: [id], onDelete: SetNull)
+  bookings     Booking[]
+  gpsPositions GpsPosition[]
+
+  @@map("schedules")
+}
+
+model Booking {
+  id             String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String        @map("user_id") @db.Uuid
+  scheduleId     String        @map("schedule_id") @db.Uuid
+  seatId         String        @map("seat_id") @db.Uuid
+  seatNumber     Int           @map("seat_number")
+  status         BookingStatus @default(pending)
+  qrCode         String?       @unique @map("qr_code")
+  totalPrice     Decimal       @map("total_price") @db.Decimal(10, 2)
+  passengerName  String?       @map("passenger_name") @db.VarChar(100)
+  passengerPhone String?       @map("passenger_phone") @db.VarChar(20)
+  lockedUntil    DateTime?     @map("locked_until") @db.Timestamptz(6)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  schedule Schedule  @relation(fields: [scheduleId], references: [id], onDelete: Restrict)
+  seat     Seat      @relation(fields: [seatId], references: [id])
+  payments Payment[]
+  review   Review?
+
+  @@unique([scheduleId, seatId])
+  @@map("bookings")
+}
+
+model Payment {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingId       String        @map("booking_id") @db.Uuid
+  amount          Decimal       @db.Decimal(10, 2)
+  method          PaymentMethod
+  status          PaymentStatus @default(pending)
+  phoneNumber     String?       @map("phone_number") @db.VarChar(20)
+  reference       String?       @unique @db.VarChar(100)
+  gatewayResponse Json?         @map("gateway_response")
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@map("payments")
+}
+
+model Review {
+  id        String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  companyId String    @map("company_id") @db.Uuid
+  bookingId String?   @unique @map("booking_id") @db.Uuid
+  rating    Int
+  comment   String?
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, bookingId])
+  @@map("reviews")
+}
+
+model GpsPosition {
+  id         String                                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  scheduleId String                                 @map("schedule_id") @db.Uuid
+  location   Unsupported("geography(Point, 4326)")
+  speed      Decimal?                               @db.Decimal(5, 2)
+  recordedAt DateTime                               @default(now()) @map("recorded_at") @db.Timestamptz(6)
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@map("gps_positions")
+}

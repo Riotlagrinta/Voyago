@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: voyago-api
+    env: node
+    rootDir: api
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false # À configurer manuellement dans le dashboard Render (URL Neon)
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://voyago.vercel.app # À ajuster selon ton domaine Vercel
