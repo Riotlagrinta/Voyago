@@ -209,7 +209,7 @@
 |--------|---|-------|------|
 | ⬜ | 4.17 | Déploiement Web (Vercel) | |
 | ⬜ | 4.18 | Déploiement API (Render) | |
-| â¬œ | 4.19 | Base de donnÃ©es prod (Neon) | 2026-04-26 |
+| â¬œ | 4.19 | Base de donnÃ©es prod (Supabase) | 2026-04-26 |
 | ⬜ | 4.20 | Redis prod (Upstash) | |
 | ⬜ | 4.21 | Monitoring (Sentry + Analytics) | |
 | ⬜ | 4.22 | Publication mobile (Play Store) | |
