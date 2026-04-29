@@ -10,12 +10,12 @@ dist/
 build/
 
 # Variables d'environnement (NE JAMAIS COMMITER)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.production
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.env.production
 
 # Logs
 npm-debug.log*

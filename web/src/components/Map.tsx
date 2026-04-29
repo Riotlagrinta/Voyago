@@ -55,39 +55,27 @@ export default function Map3D({ position, busName }: Map3DProps) {
     }
   }, [position, followMode]);
 
-  const lightStyle = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
-
-  // Configuration des bâtiments 3D (couche d'extrusion)
-  const buildingLayer: any = {
-    id: '3d-buildings',
-    source: 'openmaptiles',
-    'source-layer': 'building',
-    type: 'fill-extrusion',
-    minzoom: 15,
-    paint: {
-      'fill-extrusion-color': '#ffffff',
-      'fill-extrusion-height': ['get', 'render_height'],
-      'fill-extrusion-base': ['get', 'render_min_height'],
-      'fill-extrusion-opacity': 0.8,
-    }
-  };
+  const lightStyle = "https://demotiles.maplibre.org/style.json";
 
   return (
-    <div className="relative w-full h-full rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white transition-all duration-1000">
+    <div className="relative w-full h-full rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white">
       <Map
         ref={mapRef}
-        {...viewState}
+        initialViewState={{
+          longitude: position[0],
+          latitude: position[1],
+          zoom: 14,
+          pitch: 60,
+          bearing: 0
+        }}
         onMove={evt => setViewState(evt.viewState)}
         mapStyle={lightStyle}
         style={{ width: '100%', height: '100%' }}
         maxPitch={85}
       >
         {/* Effet de ciel (atmosphère) */}
-        <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000 bg-gradient-to-b from-sky-400/20 to-transparent" />
+        <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-primary/10 to-transparent opacity-50" />
 
-        <Source id="openmaptiles" type="vector" url="https://api.maptiler.com/tiles/v3/tiles.json?key=get_your_own_key">
-            <Layer {...buildingLayer} />
-        </Source>
 
         {/* Contrôles personnalisés */}
         <div className="absolute bottom-10 left-10 z-10 flex flex-col gap-4">

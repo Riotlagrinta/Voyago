@@ -28,7 +28,7 @@ router.get('/test-send-email', async (req, res) => {
       success: true, 
       message: `Email de test envoyé à ${testEmail}. Vérifiez votre boîte de réception (et les spams).` 
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur lors de l\'envoi de l\'email de test:', error);
     res.status(500).json({ 
       success: false, 
@@ -52,7 +52,7 @@ router.get('/test-payment-email', async (req, res) => {
       success: true, 
       message: 'Endpoint de test pour email de paiement créé. À implémenter dans NotificationService.' 
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Erreur:', error);
     res.status(500).json({ 
       success: false, 
