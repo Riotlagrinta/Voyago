@@ -1,45 +1,56 @@
 import { NextFunction, Request, Response } from 'express';
-import { pool } from '../lib/prisma';
+import { prisma, pool } from '../lib/prisma';
 
 export const getSchedules = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  // MODE MOCK POUR DÉMO
-  const mockSchedules = [
-    {
-      id: "s1",
-      departure: new Date().toISOString(),
-      price: "8500",
-      availableSeats: 12,
-      route: {
-        departureStation: { name: "Gare Agbalépédogan", city: "Lomé" },
-        arrivalStation: { name: "Gare Centrale", city: "Kara" },
-        durationMin: 420
+  try {
+    const schedules = await prisma.schedule.findMany({
+      include: {
+        route: {
+          include: {
+            departureStation: true,
+            arrivalStation: true,
+          }
+        },
+        bus: true,
+        company: true
       },
-      bus: { plateNumber: "TG 4587 AX", type: "VIP" },
-      company: { name: "Voyago", certified: true }
-    },
-    {
-      id: "s2",
-      departure: new Date(Date.now() + 3600000).toISOString(),
-      price: "7000",
-      availableSeats: 4,
-      route: {
-        departureStation: { name: "Gare Agbalépédogan", city: "Lomé" },
-        arrivalStation: { name: "Gare Sud", city: "Atakpamé" },
-        durationMin: 180
-      },
-      bus: { plateNumber: "TG 1122 BZ", type: "Standard" },
-      company: { name: "Voyago", certified: true }
-    }
-  ];
+      orderBy: { departureTime: 'asc' }
+    });
 
-  res.json({
-    success: true,
-    data: mockSchedules,
-  });
+    res.json({
+      success: true,
+      data: schedules,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const getScheduleById = async (req: Request, res: Response): Promise<void> => {
-   res.json({ success: true, data: { id: req.params.id, price: "8500", company: { name: "Voyago" }, bus: { capacity: 50 }, route: { departureStation: { city: "Lomé" }, arrivalStation: { city: "Kara" } } } });
+export const getScheduleById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const schedule = await prisma.schedule.findUnique({
+      where: { id: req.params.id },
+      include: {
+        route: {
+          include: {
+            departureStation: true,
+            arrivalStation: true,
+          }
+        },
+        bus: true,
+        company: true
+      }
+    });
+
+    if (!schedule) {
+      res.status(404).json({ success: false, message: 'Trajet non trouvé' });
+      return;
+    }
+
+    res.json({ success: true, data: schedule });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getScheduleSeats = async (req: Request, res: Response): Promise<void> => {
