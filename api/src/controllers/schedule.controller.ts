@@ -9,17 +9,22 @@ export const getSchedules = async (req: Request, res: Response, next: NextFuncti
           include: {
             departureStation: true,
             arrivalStation: true,
+            company: true
           }
         },
-        bus: true,
-        company: true
+        bus: true
       },
       orderBy: { departureTime: 'asc' }
     });
 
+    const formattedSchedules = schedules.map(s => ({
+      ...s,
+      company: s.route.company
+    }));
+
     res.json({
       success: true,
-      data: schedules,
+      data: formattedSchedules,
     });
   } catch (error) {
     next(error);
@@ -35,10 +40,10 @@ export const getScheduleById = async (req: Request, res: Response, next: NextFun
           include: {
             departureStation: true,
             arrivalStation: true,
+            company: true
           }
         },
-        bus: true,
-        company: true
+        bus: true
       }
     });
 
@@ -47,7 +52,7 @@ export const getScheduleById = async (req: Request, res: Response, next: NextFun
       return;
     }
 
-    res.json({ success: true, data: schedule });
+    res.json({ success: true, data: { ...schedule, company: schedule.route.company } });
   } catch (error) {
     next(error);
   }
