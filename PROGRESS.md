@@ -1,7 +1,7 @@
 # ✅ Voyago — Suivi des Tâches
 
 > Dernière mise à jour : 2026-04-26
-> **Progression globale** : 20/85 tâches complétées (socle technique stabilisé, chantier produit encore en cours)
+> **Progression globale** : 23/85 tâches complétées (socle technique stabilisé, chantier produit encore en cours)
 
 ---
 
@@ -13,6 +13,7 @@
 | ✅ | Création de la `ROADMAP.md` | 2026-04-15 |
 | ✅ | Création du `PROGRESS.md` (ce fichier) | 2026-04-15 |
 | ✅ | Stratégie Migration Supabase (`docs/SUPABASE_MIGRATION.md`) | 2026-04-26 |
+| ✅ | Configuration Resend pour emails transactionnels (`docs/REND_CONFIGURATION.md`) | 2026-04-26 |
 | ✅ | Relecture/correction orthographique dépôt applicatif | 2026-04-26 |
 
 ---
@@ -27,7 +28,7 @@
 | ✅ | 0.2 | Setup Next.js (web) | 2026-04-15 |
 | ✅ | 0.3 | Setup API Node.js/Express + TypeScript | 2026-04-15 |
 | ✅ | 0.4 | Setup PostgreSQL + PostGIS (Supabase) | 2026-04-24 |
-| ⬜ | 0.5 | CI/CD (GitHub Actions) | |
+| ✅ | 0.5 | CI/CD (GitHub Actions) | 2026-04-26 |
 | ✅ | 0.6 | Variables d'environnement (`.env.example`) | 2026-04-15 |
 | ✅ | 0.7 | Build `web` validé | 2026-04-26 |
 | ✅ | 0.8 | Build `api` validé | 2026-04-26 |
@@ -41,7 +42,7 @@
 
 | Statut | # | Tâche | Date |
 |--------|---|-------|------|
-| 🔄 | M.1 | Configuration `supabase-js` (Web & Mobile) | 2026-04-26 |
+| ✅ | M.1 | Configuration `supabase-js` (Web & Mobile) | 2026-04-26 |
 | ⬜ | M.2 | Migration Auth (Express ➔ Supabase Auth) | |
 | ⬜ | M.3 | Migration Logiciel (Express ➔ Edge Functions) | |
 | ⬜ | M.4 | Sécurisation RLS (Row Level Security) | |
@@ -107,9 +108,8 @@
 
 | Priorité | Sujet | Pourquoi |
 |----------|-------|-----------|
-| 🔴 | CI/CD GitHub Actions | Les vérifications passent en local mais ne sont pas encore automatisées |
 | 🔴 | Migration Auth Supabase | Le flux d'authentification reste hybride |
-| 🟡 | Documentation `.env` par application | Le démarrage du dépôt reste encore trop implicite |
+| 🟢 | Documentation `.env` par application | Toutes les variables d'environnement sont maintenant documentées et configurées |
 | 🟡 | Connexion complète des écrans mobile | Le socle Expo est prêt, mais les parcours métier restent à brancher |
 
 ---

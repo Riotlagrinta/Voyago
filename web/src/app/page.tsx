@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { useAuthStore } from "@/store/useAuthStore";
 import Bus3D from "@/components/Bus3D";
+import ActiveSchedules from "@/components/ActiveSchedules";
 import {
   MapPin,
   Search,
@@ -172,6 +173,9 @@ export default function Home() {
             </motion.div>
           </div>
         </section>
+
+        {/* Trajets en cours (Géolocalisation) */}
+        <ActiveSchedules />
 
         {/* Features */}
         <section className="py-24 bg-surface-100">

@@ -1,18 +1,17 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../lib/prisma';
 
-// En mode démo, on n'initialise Prisma que si nécessaire
-// Pour l'instant, on l'exporte comme null ou on gère l'erreur
-let prismaInstance: any;
-
-try {
-  prismaInstance = new PrismaClient();
-} catch (e) {
-  prismaInstance = {}; // Objet vide pour éviter les crashs d'importation
-}
-
-export const prisma = prismaInstance;
+export { prisma };
 
 export const connectDB = async () => {
-  console.log('🚍 Voyago API — Mode Démo activé (Données simulées)');
-  console.log('💡 La base de données réelle est ignorée pour le moment.');
+  try {
+    console.log('📡 Tentative de connexion à la base de données...');
+    await prisma.$connect();
+    console.log('✅ Connexion à la base de données établie avec succès.');
+  } catch (error) {
+    console.error('❌ Erreur lors de la connexion à la base de données :', error);
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
+  }
 };
+

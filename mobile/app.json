@@ -35,6 +35,10 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "supabaseUrl": "https://ulmdugygoaifgfljfedi.supabase.co",
+      "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVsbWR1Z3lnb2FpZmdmbGpmZWRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDc1MzcsImV4cCI6MjA5Mjc4MzUzN30.wE8zN231k10SsDmJwEcUmXoZHDNxJ9w1F5YAJ609h7s"
     }
   }
 }

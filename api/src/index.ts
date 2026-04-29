@@ -23,6 +23,7 @@ import routeRoutes from './routes/route.routes';
 import scheduleRoutes from './routes/schedule.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
+import emailTestRoutes from './routes/email.test';
 
 // Import des middlewares
 import { errorHandler } from './middlewares/error.middleware';
@@ -83,6 +84,7 @@ app.use(`${API_PREFIX}/routes`, routeRoutes);
 app.use(`${API_PREFIX}/schedules`, scheduleRoutes);
 app.use(`${API_PREFIX}/bookings`, bookingRoutes);
 app.use(`${API_PREFIX}/payments`, paymentRoutes);
+app.use(`${API_PREFIX}/email-test`, emailTestRoutes);
 
 // Health check
 app.get('/health', (_req, res) => {
