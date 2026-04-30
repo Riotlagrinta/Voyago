@@ -2,15 +2,27 @@ services:
   - type: web
     name: voyago-api
     env: node
+    region: frankfurt
     rootDir: api
     buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npm run start
+    startCommand: node dist/index.js
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
-        sync: false # À configurer manuellement dans le dashboard Render (URL Neon)
+        sync: false
+      - key: DIRECT_URL
+        sync: false
       - key: JWT_SECRET
         generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
       - key: FRONTEND_URL
-        value: https://voyago.vercel.app # À ajuster selon ton domaine Vercel
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: Voyago <noreply@voyago.tg>

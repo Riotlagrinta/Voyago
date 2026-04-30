@@ -16,6 +16,8 @@ build/
 **/.env.test.local
 **/.env.production.local
 **/.env.production
+# Garder les .env.example (templates sans secrets)
+!**/.env.example
 
 # Logs
 npm-debug.log*
