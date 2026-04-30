@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import axios from "axios";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -58,8 +59,9 @@ export default function LoginPage() {
       const { user, token } = response.data.data;
       setAuth(user, token);
       router.push("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Email ou mot de passe incorrect.");
+    } catch (err) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || "Email ou mot de passe incorrect.");
     } finally {
       setIsLoading(false);
     }

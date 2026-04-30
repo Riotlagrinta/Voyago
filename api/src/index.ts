@@ -45,27 +45,33 @@ export const io = new SocketServer(httpServer, {
 setupSocketHandlers(io);
 
 // ─── Middlewares globaux ────────────────────────────────────────────
-// app.use(helmet()); // Désactivé pour les tests 3D
+app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-// CORS - Plus permissif pour le développement
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [process.env.FRONTEND_URL || 'https://voyago.tg']
+  : [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:3001'];
+
 app.use(cors({
-  origin: true, 
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS bloqué pour l'origine: ${origin}`));
+    }
+  },
   credentials: true,
 }));
 
-// Rate limiting DÉSACTIVÉ POUR LES TESTS
-/*
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message: { error: 'Trop de requêtes, réessayez dans 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 app.use('/api/', limiter);
-*/
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));

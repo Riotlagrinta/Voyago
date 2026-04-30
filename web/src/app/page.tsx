@@ -1,5 +1,6 @@
 "use client";
 
+import React, { type ComponentType } from "react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ import {
   ChevronRight
 } from "lucide-react";
 
-function FeatureCard({ icon: Icon, title, description, delay = 0 }: { icon: any, title: string, description: string, delay?: number }) {
+function FeatureCard({ icon: Icon, title, description, delay = 0 }: { icon: ComponentType<{ className?: string }>, title: string, description: string, delay?: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

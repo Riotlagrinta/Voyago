@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import axios from "axios";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -75,8 +76,9 @@ export default function RegisterPage() {
       const { user, token } = response.data.data;
       setAuth(user, token);
       router.push("/");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Une erreur est survenue lors de l'inscription.");
+    } catch (err) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || "Une erreur est survenue lors de l'inscription.");
     } finally {
       setIsLoading(false);
     }

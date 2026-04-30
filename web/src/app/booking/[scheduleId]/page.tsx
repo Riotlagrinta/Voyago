@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import axios from "axios";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,7 @@ interface Seat {
 
 interface Schedule {
   id: string;
-  departure: string;
+  departureTime: string;
   price: string;
   route: {
     departureStation: { name: string; city: string };
@@ -134,8 +135,9 @@ export default function BookingPage() {
       if (bookings && bookings.length > 0) {
         router.push(`/booking/payment/${bookings[0].id}`);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Erreur lors de la réservation.");
+    } catch (err) {
+      const message = axios.isAxiosError(err) ? err.response?.data?.message : undefined;
+      setError(message || "Erreur lors de la réservation.");
     } finally {
       setBookingLoading(false);
     }

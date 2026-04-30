@@ -17,7 +17,7 @@ interface GpsTrackingState {
 
 export function useGpsTracking(scheduleId: string) {
   const [state, setState] = useState<GpsTrackingState>({
-    position: [6.1256, 1.2254], // Lomé par défaut
+    position: [1.2254, 6.1256], // Lomé par défaut [longitude, latitude]
     speed: 0,
     lastUpdate: null,
     isConnected: false,
@@ -34,7 +34,7 @@ export function useGpsTracking(scheduleId: string) {
         const { latitude, longitude, speed, recordedAt } = response.data.data;
         setState(prev => ({
           ...prev,
-          position: [latitude, longitude],
+          position: [longitude, latitude],
           speed: speed || 0,
           lastUpdate: new Date(recordedAt).toLocaleTimeString(),
           isPolling: true
@@ -65,10 +65,10 @@ export function useGpsTracking(scheduleId: string) {
       }
     });
 
-    socket.on('location_updated', (data: any) => {
+    socket.on('location_updated', (data: { latitude: number; longitude: number; speed: number; timestamp: string }) => {
       setState(prev => ({
         ...prev,
-        position: [data.latitude, data.longitude],
+        position: [data.longitude, data.latitude],
         speed: data.speed || 0,
         lastUpdate: new Date(data.timestamp).toLocaleTimeString(),
         isPolling: false

@@ -21,15 +21,7 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction): 
     }
   }
 
-  // Fallback démo si aucun token n'est fourni.
-  req.user = {
-    id: '00000000-0000-0000-0000-000000000001',
-    name: 'Voyago Guest Admin',
-    email: 'guest@voyago.tg',
-    role: 'super_admin',
-    companyId: 'demo-company-id',
-  };
-  next();
+  next(createError('Token manquant ou invalide.', 401));
 };
 
 export const authorize = (...roles: string[]) => {
