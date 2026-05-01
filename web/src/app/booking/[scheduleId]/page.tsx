@@ -99,6 +99,13 @@ export default function BookingPage() {
     setPassengers(updated);
   };
 
+  const normalizePhone = (p: string): string => {
+    const digits = p.replace(/\D/g, '');
+    if (digits.length === 8) return `+228${digits}`;
+    if (digits.startsWith('228') && digits.length >= 11) return `+${digits}`;
+    return p;
+  };
+
   const handleFinalBooking = async () => {
     if (passengers.some(p => !p.name.trim() || !p.phone.trim())) {
       setError("Remplissez le nom et le téléphone de chaque passager.");
@@ -112,7 +119,7 @@ export default function BookingPage() {
         seats: selectedSeats.map((seat, i) => ({
           seatId: seat.id,
           passengerName: passengers[i].name,
-          passengerPhone: passengers[i].phone,
+          passengerPhone: normalizePhone(passengers[i].phone),
         })),
       });
       const bookings = response.data.data;

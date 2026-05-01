@@ -7,12 +7,21 @@ import { TicketPDFService } from '../services/booking/TicketPDFService';
 import { QRService } from '../services/booking/QRService';
 import { JWT_SECRET } from '../lib/secrets';
 
+// Accepte 8 chiffres locaux (90123456) ou format international +22890123456
+const normalizePhone = (p: string): string => {
+  const digits = p.replace(/\D/g, '');
+  if (digits.length === 8) return `+228${digits}`;
+  if (digits.length === 11 && digits.startsWith('228')) return `+${digits}`;
+  if (digits.length === 12 && digits.startsWith('228')) return `+${digits}`;
+  return p;
+};
+
 const createBookingSchema = z.object({
   scheduleId: z.string().uuid('scheduleId invalide.'),
   seats: z.array(z.object({
     seatId: z.string().uuid('seatId invalide.'),
     passengerName: z.string().min(2, 'Nom du passager requis (min 2 caractères).'),
-    passengerPhone: z.string().regex(/^\+?228[0-9]{8}$/, 'Format téléphone Togo invalide (+228XXXXXXXX).'),
+    passengerPhone: z.string().min(8, 'Numéro de téléphone invalide.'),
   })).min(1).max(5),
 });
 
@@ -32,22 +41,50 @@ const bookingInclude = {
   seat: true,
 } as const;
 
-export const createBooking = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return next(createError('Non authentifié.', 401));
+// Trouve ou crée un utilisateur invité identifié par son numéro de téléphone.
+// Si l'utilisateur est connecté, on réutilise son compte directement.
+const resolveUserId = async (req: Request, phone: string): Promise<string> => {
+  if (req.user?.id) return req.user.id;
 
+  const normalizedPhone = normalizePhone(phone);
+
+  // Cherche un compte invité existant pour ce numéro
+  const existing = await prisma.user.findFirst({
+    where: { phone: normalizedPhone },
+    select: { id: true },
+  });
+  if (existing) return existing.id;
+
+  // Crée un compte invité minimal
+  const guest = await prisma.user.create({
+    data: {
+      name: `Invité ${normalizedPhone.slice(-4)}`,
+      email: `guest_${normalizedPhone.replace(/\D/g, '')}@voyago.guest`,
+      phone: normalizedPhone,
+      passwordHash: '',
+      role: 'passenger',
+      isActive: true,
+      emailVerified: false,
+    },
+    select: { id: true },
+  });
+  return guest.id;
+};
+
+export const createBooking = async (req: Request, res: Response, next: NextFunction) => {
   const parsed = createBookingSchema.safeParse(req.body);
   if (!parsed.success) return next(createError(parsed.error.issues[0].message, 400));
 
   const { scheduleId, seats } = parsed.data;
 
   try {
+    // Résoudre l'utilisateur (connecté ou invité) avant la transaction
+    const userId = await resolveUserId(req, seats[0].passengerPhone);
     const seatIds = seats.map(s => s.seatId);
     const lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
 
-    // Tout dans une seule transaction interactive pour éviter la race condition.
-    // Les lectures se font APRÈS le début de la transaction, avec isolation serializable.
     const bookings = await prisma.$transaction(async (tx) => {
-      // 1. Lire le trajet à l'intérieur de la transaction
+      // 1. Lire le trajet
       const schedule = await tx.schedule.findUnique({
         where: { id: scheduleId },
         select: { id: true, price: true, availableSeats: true, status: true },
@@ -62,13 +99,12 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
         );
       }
 
-      // 2. Vérifier la disponibilité des sièges à l'intérieur de la transaction
+      // 2. Vérifier la disponibilité des sièges
       const conflictingBookings = await tx.booking.findMany({
         where: {
           scheduleId,
           seatId: { in: seatIds },
           status: { in: ['pending', 'confirmed'] },
-          // Ignorer les locks expirés
           OR: [
             { lockedUntil: null },
             { lockedUntil: { gt: new Date() } },
@@ -97,12 +133,12 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       const created = await Promise.all(
         seats.map(s => tx.booking.create({
           data: {
-            userId: req.user!.id,
+            userId,
             scheduleId,
             seatId: s.seatId,
             seatNumber: seatMap.get(s.seatId)!.seatNumber,
             passengerName: s.passengerName,
-            passengerPhone: s.passengerPhone,
+            passengerPhone: normalizePhone(s.passengerPhone),
             status: 'pending',
             totalPrice: Number(schedule.price),
             lockedUntil,
@@ -111,7 +147,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
         }))
       );
 
-      // 5. Décrémenter les places disponibles dans la même transaction
+      // 5. Décrémenter les places disponibles
       await tx.schedule.update({
         where: { id: scheduleId },
         data: { availableSeats: { decrement: seats.length } },
@@ -147,8 +183,6 @@ export const getBookings = async (req: Request, res: Response, next: NextFunctio
 };
 
 export const getBookingById = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) return next(createError('Non authentifié.', 401));
-
   try {
     const booking = await prisma.booking.findUnique({
       where: { id: req.params.id },
@@ -156,7 +190,9 @@ export const getBookingById = async (req: Request, res: Response, next: NextFunc
     });
 
     if (!booking) return next(createError('Réservation introuvable.', 404));
-    if (booking.userId !== req.user.id && req.user.role !== 'super_admin') {
+
+    // Si connecté et pas super_admin, vérifier que la réservation lui appartient
+    if (req.user && req.user.role !== 'super_admin' && booking.userId !== req.user.id) {
       return next(createError('Accès interdit.', 403));
     }
 
