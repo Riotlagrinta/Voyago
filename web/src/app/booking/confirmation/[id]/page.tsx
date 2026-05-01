@@ -11,8 +11,14 @@ import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import dynamic from "next/dynamic";
 import api from "@/lib/api";
 import Ticket3D from "@/components/Ticket3D";
+
+const RouteVisualization3D = dynamic(() => import("@/components/RouteVisualization3D"), {
+  ssr: false,
+  loading: () => <div className="w-full h-[280px] rounded-3xl bg-surface-100 animate-pulse" />,
+});
 
 interface Booking {
   id: string;
@@ -121,7 +127,7 @@ export default function ConfirmationPage() {
         </div>
 
         {/* Ticket 3D */}
-        <div className="mb-12 relative h-[420px]">
+        <div className="mb-6 relative h-[420px]">
           <div className="absolute inset-0 bg-primary/5 rounded-[3rem] blur-3xl -z-10" />
           <Ticket3D
             passengerName={booking.passengerName || "Passager"}
@@ -133,6 +139,17 @@ export default function ConfirmationPage() {
           <p className="text-center text-[10px] text-foreground/20 font-bold uppercase tracking-widest mt-2">
             Faites pivoter avec votre souris
           </p>
+        </div>
+
+        {/* Visualisation 3D du trajet */}
+        <div className="mb-12">
+          <p className="text-center text-[10px] font-black uppercase tracking-widest text-foreground/30 mb-4">
+            Votre itinéraire
+          </p>
+          <RouteVisualization3D
+            from={booking.schedule.route.departureStation.city}
+            to={booking.schedule.route.arrivalStation.city}
+          />
         </div>
 
         {/* Carte ticket */}
