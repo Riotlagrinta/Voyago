@@ -11,7 +11,6 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import api from "@/lib/api";
-import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
 
 interface Booking {
@@ -46,21 +45,16 @@ const STATUS_LABELS: Record<string, string> = {
 
 export default function MyBookingsPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login?redirect=/bookings");
-      return;
-    }
     api.get("/bookings")
       .then(r => setBookings(r.data.data || []))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [isAuthenticated, router]);
+  }, []);
 
   const now = new Date();
   const upcomingBookings = bookings.filter(b => new Date(b.schedule.departureTime) >= now);

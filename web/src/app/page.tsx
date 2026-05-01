@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { DatePicker } from "@/components/ui/DatePicker";
 import { useAuthStore } from "@/store/useAuthStore";
-import Bus3D from "@/components/Bus3D";
+import dynamic from "next/dynamic";
+const Bus3D = dynamic(() => import("@/components/Bus3D"), { ssr: false });
 import ActiveSchedules from "@/components/ActiveSchedules";
 import {
   MapPin,

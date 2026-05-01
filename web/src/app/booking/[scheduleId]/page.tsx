@@ -12,7 +12,6 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import api from "@/lib/api";
-import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
 
 interface Seat {
@@ -48,8 +47,6 @@ const STEPS = [
 export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
-
   const [schedule, setSchedule] = useState<Schedule | null>(null);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
@@ -60,10 +57,6 @@ export default function BookingPage() {
   const [passengers, setPassengers] = useState<Array<{ name: string; phone: string }>>([]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push(`/login?redirect=/booking/${params.scheduleId}`);
-      return;
-    }
     const fetchData = async () => {
       try {
         const [schedRes, seatsRes] = await Promise.all([
@@ -79,7 +72,7 @@ export default function BookingPage() {
       }
     };
     fetchData();
-  }, [params.scheduleId, isAuthenticated, router]);
+  }, [params.scheduleId]);
 
   const handleSeatClick = (seat: Seat) => {
     if (seat.status !== "available") return;
@@ -95,10 +88,7 @@ export default function BookingPage() {
 
   const handleNextStep = () => {
     if (selectedSeats.length === 0) { setError("Sélectionnez au moins un siège."); return; }
-    setPassengers(selectedSeats.map((_, i) => ({
-      name: i === 0 ? (user?.name || "") : "",
-      phone: i === 0 ? (user?.phone || "") : "",
-    })));
+    setPassengers(selectedSeats.map(() => ({ name: "", phone: "" })));
     setStep(2);
     setError(null);
   };
