@@ -1,3 +1,5 @@
+"use client";
+
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -23,15 +25,9 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      // MODE LIBRE : Utilisateur Guest par défaut
-      user: {
-        id: '00000000-0000-0000-0000-000000000001',
-        name: 'Voyago Guest',
-        email: 'guest@voyago.tg',
-        role: 'super_admin'
-      },
-      token: 'voyago-dummy-token',
-      isAuthenticated: true,
+      user: null,
+      token: null,
+      isAuthenticated: false,
 
       setAuth: (user, token) => {
         if (typeof window !== "undefined") {
