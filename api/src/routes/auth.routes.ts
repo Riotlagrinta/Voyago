@@ -1,11 +1,14 @@
 import { Router } from 'express';
-import { register, login, getMe, refreshToken, logout } from '../controllers/auth.controller';
+import { register, login, getMe, refreshToken, logout, guestLogin } from '../controllers/auth.controller';
 import { authenticate } from '../middlewares/auth.middleware';
 
 const router = Router();
 
 // POST /api/v1/auth/register
 router.post('/register', register);
+
+// POST /api/v1/auth/guest — session anonyme automatique
+router.post('/guest', guestLogin);
 
 // POST /api/v1/auth/login
 router.post('/login', login);

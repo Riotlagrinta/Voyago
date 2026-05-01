@@ -137,6 +137,40 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+export const guestLogin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Identifiant unique du navigateur envoyé par le client (ou on en génère un)
+    const { fingerprint } = req.body;
+    const guestEmail = `guest_${fingerprint || Date.now()}@voyago.guest`;
+
+    let user = await prisma.user.findUnique({ where: { email: guestEmail } });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          name: 'Invité',
+          email: guestEmail,
+          passwordHash: '',
+          role: 'passenger',
+          isActive: true,
+          emailVerified: false,
+        },
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '30d' },
+    );
+
+    const { passwordHash, ...userWithoutPassword } = user;
+    res.status(200).json({ success: true, data: { user: userWithoutPassword, token } });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const refreshToken = async (req: Request, res: Response) => {
   // Simplifié pour la démo
   res.json({ success: true });
