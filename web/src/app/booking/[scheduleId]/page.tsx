@@ -260,45 +260,53 @@ export default function BookingPage() {
                 </div>
 
                 {/* Grille de sièges par rangée */}
-                <div className="bg-surface-100 rounded-2xl p-6 max-w-sm mx-auto space-y-3">
-                  {/* Indicateur avant du bus */}
-                  <div className="flex items-center justify-center gap-2 mb-4 text-[10px] font-black uppercase text-foreground/30 tracking-widest">
-                    <div className="flex-grow h-px bg-border/50" />
-                    <Bus className="w-4 h-4" /> AVANT
-                    <div className="flex-grow h-px bg-border/50" />
+                {rows.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <Bus className="w-10 h-10 text-foreground/20 mb-3" />
+                    <p className="text-sm font-bold text-foreground/40">Plan de sièges non disponible</p>
+                    <p className="text-xs text-foreground/30 mt-1">Contactez la compagnie pour plus d'informations.</p>
                   </div>
-                  {rows.map(rowNum => (
-                    <div key={rowNum} className="flex items-center gap-2 justify-center">
-                      <span className="text-[10px] font-black text-foreground/20 w-4 text-right">{rowNum}</span>
-                      <div className="flex gap-2">
-                        {seatsByRow[rowNum]
-                          .sort((a, b) => a.colPos - b.colPos)
-                          .map((seat, colIdx) => (
-                            <React.Fragment key={seat.id}>
-                              {/* Allée centrale entre col 2 et 3 */}
-                              {colIdx === 2 && <div className="w-4" />}
-                              <button
-                                onClick={() => handleSeatClick(seat)}
-                                disabled={seat.status !== "available"}
-                                className={cn(
-                                  "w-10 h-10 rounded-lg text-xs font-bold border-2 transition-all duration-150 flex items-center justify-center",
-                                  seat.status === "occupied" || seat.status === "locked"
-                                    ? "bg-border/20 border-transparent text-foreground/20 cursor-not-allowed"
-                                    : selectedSeats.find(s => s.id === seat.id)
-                                      ? "bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-105"
-                                      : "bg-white border-border hover:border-primary/50 hover:bg-primary/5 text-foreground/60 cursor-pointer"
-                                )}
-                              >
-                                {seat.status === "occupied" || seat.status === "locked"
-                                  ? <Lock className="w-3 h-3" />
-                                  : seat.seatNumber}
-                              </button>
-                            </React.Fragment>
-                          ))}
-                      </div>
+                ) : (
+                  <div className="bg-surface-100 rounded-2xl p-6 max-w-sm mx-auto space-y-3">
+                    {/* Indicateur avant du bus */}
+                    <div className="flex items-center justify-center gap-2 mb-4 text-[10px] font-black uppercase text-foreground/30 tracking-widest">
+                      <div className="flex-grow h-px bg-border/50" />
+                      <Bus className="w-4 h-4" /> AVANT
+                      <div className="flex-grow h-px bg-border/50" />
                     </div>
-                  ))}
-                </div>
+                    {rows.map(rowNum => (
+                      <div key={rowNum} className="flex items-center gap-2 justify-center">
+                        <span className="text-[10px] font-black text-foreground/20 w-4 text-right">{rowNum}</span>
+                        <div className="flex gap-2">
+                          {[...seatsByRow[rowNum]]
+                            .sort((a, b) => a.colPos - b.colPos)
+                            .map((seat, colIdx) => (
+                              <React.Fragment key={seat.id}>
+                                {/* Allée centrale entre col 2 et 3 */}
+                                {colIdx === 2 && <div className="w-4" />}
+                                <button
+                                  onClick={() => handleSeatClick(seat)}
+                                  disabled={seat.status !== "available"}
+                                  className={cn(
+                                    "w-10 h-10 rounded-lg text-xs font-bold border-2 transition-all duration-150 flex items-center justify-center",
+                                    seat.status === "occupied" || seat.status === "locked"
+                                      ? "bg-border/20 border-transparent text-foreground/20 cursor-not-allowed"
+                                      : selectedSeats.find(s => s.id === seat.id)
+                                        ? "bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-105"
+                                        : "bg-white border-border hover:border-primary/50 hover:bg-primary/5 text-foreground/60 cursor-pointer"
+                                  )}
+                                >
+                                  {seat.status === "occupied" || seat.status === "locked"
+                                    ? <Lock className="w-3 h-3" />
+                                    : seat.seatNumber}
+                                </button>
+                              </React.Fragment>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {selectedSeats.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
