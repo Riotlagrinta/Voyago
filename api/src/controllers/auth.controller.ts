@@ -4,13 +4,12 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { createError } from '../middlewares/error.middleware';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'voyago-dev-secret';
+import { JWT_SECRET, JWT_EXPIRES_IN } from '../lib/secrets';
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, 'Le nom doit contenir au moins 2 caractères.'),
   email: z.string().trim().email('Email invalide.'),
-  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères.'),
+  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères.'),
   phone: z.string().trim().regex(/^\+228[0-9]{8}$/, 'Format téléphone Togo invalide (+228XXXXXXXX).').optional(),
 });
 
@@ -40,15 +39,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
-        role: user.role,
-        // Si l'utilisateur est un admin de compagnie, on pourrait vouloir inclure son companyId
-        // Mais pour l'instant le schéma ne montre pas de lien direct User -> Company (1-1 ou 1-N via adminId)
-      }, 
+      { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: JWT_EXPIRES_IN }
     );
 
     // On ne renvoie pas le passwordHash
@@ -102,7 +95,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role }, 
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: JWT_EXPIRES_IN }
     );
 
     const { passwordHash, ...userWithoutPassword } = user;

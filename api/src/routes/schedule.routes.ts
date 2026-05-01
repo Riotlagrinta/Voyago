@@ -12,7 +12,9 @@ const router = Router();
 router.get('/', getSchedules);
 router.get('/:id', getScheduleById);
 router.get('/:id/seats', getScheduleSeats);
-router.get('/:id/location', getLatestScheduleLocation); // Fallback Polling
+
+// Protégé - GPS position (passager authentifié uniquement)
+router.get('/:id/location', authenticate, getLatestScheduleLocation);
 
 // Protégé - company_admin
 router.post('/', authenticate, authorize('company_admin', 'super_admin'), createSchedule);

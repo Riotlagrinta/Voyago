@@ -22,6 +22,15 @@ interface AuthState {
   updateUser: (user: Partial<User>) => void;
 }
 
+// Accès localStorage sécurisé (crash en navigation privée sur certains navigateurs)
+function safeLocalStorage() {
+  try {
+    return typeof window !== "undefined" ? window.localStorage : null;
+  } catch {
+    return null;
+  }
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -30,15 +39,19 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       setAuth: (user, token) => {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("voyago-token", token);
+        try {
+          safeLocalStorage()?.setItem("voyago-token", token);
+        } catch {
+          // Navigation privée ou quota dépassé — on continue sans persister
         }
         set({ user, token, isAuthenticated: true });
       },
 
       logout: () => {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("voyago-token");
+        try {
+          safeLocalStorage()?.removeItem("voyago-token");
+        } catch {
+          // Ignore
         }
         set({ user: null, token: null, isAuthenticated: false });
       },
@@ -50,7 +63,19 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "voyago-auth-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => {
+        // Fallback vers un storage en mémoire si localStorage inaccessible
+        try {
+          return localStorage;
+        } catch {
+          const memStore = new Map<string, string>();
+          return {
+            getItem: (k) => memStore.get(k) ?? null,
+            setItem: (k, v) => memStore.set(k, v),
+            removeItem: (k) => memStore.delete(k),
+          };
+        }
+      }),
     }
   )
 );

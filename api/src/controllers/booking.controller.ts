@@ -5,15 +5,14 @@ import { prisma } from '../lib/prisma';
 import { createError } from '../middlewares/error.middleware';
 import { TicketPDFService } from '../services/booking/TicketPDFService';
 import { QRService } from '../services/booking/QRService';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'voyago-super-secret-key';
+import { JWT_SECRET } from '../lib/secrets';
 
 const createBookingSchema = z.object({
   scheduleId: z.string().uuid('scheduleId invalide.'),
   seats: z.array(z.object({
     seatId: z.string().uuid('seatId invalide.'),
-    passengerName: z.string().min(2, 'Nom requis.'),
-    passengerPhone: z.string().min(8, 'Téléphone requis.'),
+    passengerName: z.string().min(2, 'Nom du passager requis (min 2 caractères).'),
+    passengerPhone: z.string().regex(/^\+?228[0-9]{8}$/, 'Format téléphone Togo invalide (+228XXXXXXXX).'),
   })).min(1).max(5),
 });
 
@@ -42,68 +41,91 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
   const { scheduleId, seats } = parsed.data;
 
   try {
-    const schedule = await prisma.schedule.findUnique({
-      where: { id: scheduleId },
-      select: { id: true, price: true, availableSeats: true, status: true },
-    });
-
-    if (!schedule) return next(createError('Trajet introuvable.', 404));
-    if (schedule.status === 'cancelled') return next(createError('Ce trajet a été annulé.', 400));
-    if (schedule.availableSeats < seats.length)
-      return next(createError(`Seulement ${schedule.availableSeats} place(s) disponible(s).`, 400));
-
-    // Vérifier que tous les sièges sont disponibles
     const seatIds = seats.map(s => s.seatId);
-    const existingBookings = await prisma.booking.findMany({
-      where: {
-        scheduleId,
-        seatId: { in: seatIds },
-        status: { in: ['pending', 'confirmed'] },
-      },
-      select: { seatId: true },
-    });
-
-    if (existingBookings.length > 0) {
-      return next(createError('Un ou plusieurs sièges sont déjà réservés.', 409));
-    }
-
-    const seatRecords = await prisma.seat.findMany({
-      where: { id: { in: seatIds } },
-      select: { id: true, seatNumber: true },
-    });
-
-    if (seatRecords.length !== seatIds.length) {
-      return next(createError('Un ou plusieurs sièges sont introuvables.', 400));
-    }
-
-    const seatMap = new Map(seatRecords.map(s => [s.id, s]));
     const lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
 
-    const bookings = await prisma.$transaction(
-      seats.map(s => prisma.booking.create({
-        data: {
-          userId: req.user!.id,
-          scheduleId,
-          seatId: s.seatId,
-          seatNumber: seatMap.get(s.seatId)!.seatNumber,
-          passengerName: s.passengerName,
-          passengerPhone: s.passengerPhone,
-          status: 'pending',
-          totalPrice: Number(schedule.price),
-          lockedUntil,
-        },
-        include: bookingInclude,
-      }))
-    );
+    // Tout dans une seule transaction interactive pour éviter la race condition.
+    // Les lectures se font APRÈS le début de la transaction, avec isolation serializable.
+    const bookings = await prisma.$transaction(async (tx) => {
+      // 1. Lire le trajet à l'intérieur de la transaction
+      const schedule = await tx.schedule.findUnique({
+        where: { id: scheduleId },
+        select: { id: true, price: true, availableSeats: true, status: true },
+      });
 
-    // Décrémenter les places disponibles
-    await prisma.schedule.update({
-      where: { id: scheduleId },
-      data: { availableSeats: { decrement: seats.length } },
-    });
+      if (!schedule) throw Object.assign(new Error('Trajet introuvable.'), { statusCode: 404 });
+      if (schedule.status === 'cancelled') throw Object.assign(new Error('Ce trajet a été annulé.'), { statusCode: 400 });
+      if (schedule.availableSeats < seats.length) {
+        throw Object.assign(
+          new Error(`Seulement ${schedule.availableSeats} place(s) disponible(s).`),
+          { statusCode: 400 }
+        );
+      }
+
+      // 2. Vérifier la disponibilité des sièges à l'intérieur de la transaction
+      const conflictingBookings = await tx.booking.findMany({
+        where: {
+          scheduleId,
+          seatId: { in: seatIds },
+          status: { in: ['pending', 'confirmed'] },
+          // Ignorer les locks expirés
+          OR: [
+            { lockedUntil: null },
+            { lockedUntil: { gt: new Date() } },
+          ],
+        },
+        select: { seatId: true },
+      });
+
+      if (conflictingBookings.length > 0) {
+        throw Object.assign(new Error('Un ou plusieurs sièges sont déjà réservés.'), { statusCode: 409 });
+      }
+
+      // 3. Récupérer les sièges
+      const seatRecords = await tx.seat.findMany({
+        where: { id: { in: seatIds } },
+        select: { id: true, seatNumber: true },
+      });
+
+      if (seatRecords.length !== seatIds.length) {
+        throw Object.assign(new Error('Un ou plusieurs sièges sont introuvables.'), { statusCode: 400 });
+      }
+
+      const seatMap = new Map(seatRecords.map(s => [s.id, s]));
+
+      // 4. Créer les réservations
+      const created = await Promise.all(
+        seats.map(s => tx.booking.create({
+          data: {
+            userId: req.user!.id,
+            scheduleId,
+            seatId: s.seatId,
+            seatNumber: seatMap.get(s.seatId)!.seatNumber,
+            passengerName: s.passengerName,
+            passengerPhone: s.passengerPhone,
+            status: 'pending',
+            totalPrice: Number(schedule.price),
+            lockedUntil,
+          },
+          include: bookingInclude,
+        }))
+      );
+
+      // 5. Décrémenter les places disponibles dans la même transaction
+      await tx.schedule.update({
+        where: { id: scheduleId },
+        data: { availableSeats: { decrement: seats.length } },
+      });
+
+      return created;
+    }, { isolationLevel: 'Serializable' });
 
     return res.status(201).json({ success: true, data: bookings });
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as { statusCode?: number; message?: string };
+    if (err.statusCode) {
+      return next(createError(err.message || 'Erreur réservation.', err.statusCode));
+    }
     next(error);
   }
 };
@@ -161,8 +183,17 @@ export const cancelBooking = async (req: Request, res: Response, next: NextFunct
       return next(createError('Cette réservation est déjà annulée.', 400));
     }
     if (booking.status === 'completed') {
-      return next(createError('Impossible d\'annuler un voyage terminé.', 400));
+      return next(createError("Impossible d'annuler un voyage terminé.", 400));
     }
+
+    // Compter le nombre de sièges de cette réservation pour la bonne incrémentation
+    const seatsToFree = await prisma.booking.count({
+      where: {
+        userId: req.user.role === 'super_admin' ? undefined : req.user.id,
+        scheduleId: booking.scheduleId,
+        status: { in: ['pending', 'confirmed'] },
+      },
+    });
 
     await prisma.$transaction([
       prisma.booking.update({
@@ -171,7 +202,7 @@ export const cancelBooking = async (req: Request, res: Response, next: NextFunct
       }),
       prisma.schedule.update({
         where: { id: booking.scheduleId },
-        data: { availableSeats: { increment: 1 } },
+        data: { availableSeats: { increment: seatsToFree > 0 ? seatsToFree : 1 } },
       }),
     ]);
 

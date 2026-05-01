@@ -1,171 +1,137 @@
-import { PrismaClient, PaymentStatus, BookingStatus, PaymentMethod } from '@prisma/client';
+import { PaymentStatus, BookingStatus, PaymentMethod } from '@prisma/client';
 import { PaymentFactory } from './PaymentFactory';
 import { PaymentRequest } from './types';
 import { prisma } from '../../lib/prisma';
 import { QRService } from '../booking/QRService';
 
 export class PaymentService {
-  /**
-   * Traite un paiement pour une réservation
-   */
   static async processBookingPayment(bookingId: string, method: PaymentMethod, phoneNumber: string) {
+    // 1. Lire la réservation hors transaction (lecture seule, pas besoin d'isolation)
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: { schedule: true },
+    });
+
+    if (!booking) throw new Error('Réservation introuvable');
+    if (booking.status === BookingStatus.confirmed) throw new Error('Cette réservation est déjà confirmée');
+
+    // 2. Créer l'enregistrement de paiement initial (avant d'appeler le provider)
+    const payment = await prisma.payment.create({
+      data: {
+        bookingId: booking.id,
+        amount: booking.totalPrice,
+        method,
+        status: PaymentStatus.pending,
+        phoneNumber,
+      },
+    });
+
+    // 3. Appel au provider externe (hors transaction — les appels réseau ne peuvent pas être rollback)
+    const provider = PaymentFactory.getProvider(method);
+    const paymentRequest: PaymentRequest = {
+      amount: Number(booking.totalPrice),
+      currency: 'XOF',
+      phoneNumber,
+      method,
+      description: `Voyago - Réservation #${booking.id}`,
+      metadata: { bookingId: booking.id, paymentId: payment.id },
+    };
+
+    let response;
     try {
-      // 1. Récupérer la réservation
-      const booking = await prisma.booking.findUnique({
-        where: { id: bookingId },
-        include: { schedule: true }
+      response = await provider.initiatePayment(paymentRequest);
+    } catch (providerError) {
+      // Marquer le paiement comme échoué si le provider est inaccessible
+      await prisma.payment.update({
+        where: { id: payment.id },
+        data: { status: PaymentStatus.failed },
       });
+      throw providerError;
+    }
 
-      if (!booking) {
-        throw new Error('Réservation introuvable');
-      }
-
-      if (booking.status === BookingStatus.confirmed) {
-        throw new Error('Cette réservation est déjà confirmée');
-      }
-
-      // 2. Créer l'enregistrement de paiement initial
-      const payment = await prisma.payment.create({
-        data: {
-          bookingId: booking.id,
-          amount: booking.totalPrice,
-          method: method,
-          status: PaymentStatus.pending,
-          phoneNumber: phoneNumber
-        }
-      });
-
-      // 3. Obtenir le provider via la Factory
-      const provider = PaymentFactory.getProvider(method);
-
-      // 4. Initier le paiement
-      const paymentRequest: PaymentRequest = {
-        amount: Number(booking.totalPrice),
-        currency: 'XOF',
-        phoneNumber: phoneNumber,
-        method: method,
-        description: `Voyago - Réservation #${booking.id}`,
-        metadata: { bookingId: booking.id, paymentId: payment.id }
-      };
-
-      const response = await provider.initiatePayment(paymentRequest);
-
-      // 5. Mettre à jour le paiement avec la réponse du provider
-      const updatedPayment = await prisma.payment.update({
+    // 4. Mettre à jour payment + booking dans une transaction atomique
+    const updatedPayment = await prisma.$transaction(async (tx) => {
+      const updated = await tx.payment.update({
         where: { id: payment.id },
         data: {
           status: response.status,
           reference: response.transactionId,
-          gatewayResponse: response.rawResponse || {}
-        }
+          gatewayResponse: response.rawResponse ?? {},
+        },
       });
 
-      // 6. Gestion des résultats
       if (response.status === PaymentStatus.completed) {
         const qrCode = QRService.generateTicketData(bookingId);
-
-        await prisma.booking.update({
+        await tx.booking.update({
           where: { id: bookingId },
-          data: {
-            status: BookingStatus.confirmed,
-            qrCode: qrCode
-          }
+          data: { status: BookingStatus.confirmed, qrCode },
         });
-
-        console.log(`[PaymentService] Réservation ${bookingId} confirmée.`);
-      } else if (response.status === PaymentStatus.failed) {
-        // En cas d'échec explicite du provider
-        await prisma.booking.update({
-          where: { id: bookingId },
-          data: { status: BookingStatus.pending } // On garde en pending pour permettre un retry
-        });
-        throw new Error(response.message || 'Le paiement a échoué auprès du fournisseur');
       }
 
-      return {
-        payment: updatedPayment,
-        bookingStatus: response.status === PaymentStatus.completed ? BookingStatus.confirmed : BookingStatus.pending,
-        message: response.message
-      };
+      return updated;
+    });
 
-    } catch (error: any) {
-      console.error(`[PaymentService] Erreur lors du traitement du paiement:`, error.message);
-      throw error;
+    if (response.status === PaymentStatus.failed) {
+      throw new Error(response.message || 'Le paiement a échoué auprès du fournisseur.');
     }
+
+    return {
+      payment: updatedPayment,
+      bookingStatus: response.status === PaymentStatus.completed
+        ? BookingStatus.confirmed
+        : BookingStatus.pending,
+      message: response.message,
+    };
   }
 
-  /**
-   * Effectue un remboursement
-   */
   static async processRefund(paymentId: string) {
-    try {
-      const payment = await prisma.payment.findUnique({
-        where: { id: paymentId },
-        include: { booking: true }
-      });
+    const payment = await prisma.payment.findUnique({
+      where: { id: paymentId },
+      include: { booking: true },
+    });
 
-      if (!payment || !payment.reference) {
-        throw new Error('Paiement introuvable ou non référencé');
-      }
+    if (!payment || !payment.reference) throw new Error('Paiement introuvable ou non référencé');
+    if (payment.status === PaymentStatus.refunded) throw new Error('Ce paiement a déjà été remboursé');
 
-      if (payment.status === PaymentStatus.refunded) {
-        throw new Error('Ce paiement a déjà été remboursé');
-      }
+    const provider = PaymentFactory.getProvider(payment.method);
+    const response = await provider.refund(payment.reference, Number(payment.amount));
 
-      const provider = PaymentFactory.getProvider(payment.method);
-      const response = await provider.refund(payment.reference, Number(payment.amount));
-
-      if (response.status === PaymentStatus.refunded) {
-        await prisma.payment.update({
-          where: { id: paymentId },
-          data: { status: PaymentStatus.refunded }
-        });
-
-        await prisma.booking.update({
-          where: { id: payment.bookingId },
-          data: { status: BookingStatus.cancelled }
-        });
-
-        console.log(`[PaymentService] Paiement ${paymentId} remboursé et réservation annulée.`);
-      }
-
-      return response;
-    } catch (error: any) {
-      console.error(`[PaymentService] Erreur lors du remboursement:`, error.message);
-      throw error;
+    if (response.status === PaymentStatus.refunded) {
+      await prisma.$transaction([
+        prisma.payment.update({ where: { id: paymentId }, data: { status: PaymentStatus.refunded } }),
+        prisma.booking.update({ where: { id: payment.bookingId }, data: { status: BookingStatus.cancelled } }),
+      ]);
     }
+
+    return response;
   }
 
-  /**
-   * Vérifie et synchronise le statut d'un paiement
-   */
   static async syncPaymentStatus(paymentId: string) {
     const payment = await prisma.payment.findUnique({
       where: { id: paymentId },
-      include: { booking: true }
+      include: { booking: true },
     });
 
-    if (!payment || !payment.reference) return;
+    if (!payment?.reference) return;
 
     const provider = PaymentFactory.getProvider(payment.method);
     const response = await provider.checkStatus(payment.reference);
 
     if (response.status !== payment.status) {
-      await prisma.payment.update({
-        where: { id: paymentId },
-        data: { status: response.status }
-      });
+      await prisma.$transaction(async (tx) => {
+        await tx.payment.update({ where: { id: paymentId }, data: { status: response.status } });
 
-      if (response.status === PaymentStatus.completed && payment.booking.status !== BookingStatus.confirmed) {
-        const qrCode = QRService.generateTicketData(payment.bookingId);
-        await prisma.booking.update({
-          where: { id: payment.bookingId },
-          data: { 
-            status: BookingStatus.confirmed,
-            qrCode: qrCode
-          }
-        });
-      }
+        if (
+          response.status === PaymentStatus.completed &&
+          payment.booking.status !== BookingStatus.confirmed
+        ) {
+          const qrCode = QRService.generateTicketData(payment.bookingId);
+          await tx.booking.update({
+            where: { id: payment.bookingId },
+            data: { status: BookingStatus.confirmed, qrCode },
+          });
+        }
+      });
     }
 
     return response;

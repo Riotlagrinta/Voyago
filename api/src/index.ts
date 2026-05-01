@@ -29,6 +29,7 @@ import emailTestRoutes from './routes/email.test';
 import { errorHandler } from './middlewares/error.middleware';
 import { notFound } from './middlewares/notFound.middleware';
 import { setupSocketHandlers } from './lib/socket';
+import { startLockCleaner } from './lib/lockCleaner';
 
 const app = express();
 const httpServer = createServer(app);
@@ -77,6 +78,7 @@ app.use(cors({
   credentials: true,
 }));
 
+// Rate limit général
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -86,6 +88,15 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// Rate limit strict sur l'authentification (anti brute-force)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Trop de tentatives de connexion, réessayez dans 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -93,7 +104,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // ─── Routes API ─────────────────────────────────────────────────────
 const API_PREFIX = '/api/v1';
 
-app.use(`${API_PREFIX}/auth`, authRoutes);
+app.use(`${API_PREFIX}/auth`, authLimiter, authRoutes);
 app.use(`${API_PREFIX}/users`, userRoutes);
 app.use(`${API_PREFIX}/stations`, stationRoutes);
 app.use(`${API_PREFIX}/companies`, companyRoutes);
@@ -124,6 +135,7 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 
 export const startServer = async () => {
   await connectDB();
+  startLockCleaner();
 
   return httpServer.listen(PORT, () => {
     console.log(`
