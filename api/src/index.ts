@@ -33,10 +33,27 @@ import { setupSocketHandlers } from './lib/socket';
 const app = express();
 const httpServer = createServer(app);
 
+// ─── CORS ───────────────────────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+].filter(Boolean);
+
+const isAllowedOrigin = (origin: string) => {
+  if (allowedOrigins.includes(origin)) return true;
+  // Autoriser tous les sous-domaines *.vercel.app
+  if (/^https:\/\/[\w-]+\.vercel\.app$/.test(origin)) return true;
+  return false;
+};
+
 // ─── Socket.io (GPS temps réel) ────────────────────────────────────
 export const io = new SocketServer(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      if (!origin || isAllowedOrigin(origin)) callback(null, true);
+      else callback(new Error(`CORS bloqué: ${origin}`));
+    },
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -49,13 +66,9 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(compression());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [process.env.FRONTEND_URL || 'https://voyago.tg']
-  : [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:3001'];
-
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || isAllowedOrigin(origin)) {
       callback(null, true);
     } else {
       callback(new Error(`CORS bloqué pour l'origine: ${origin}`));
