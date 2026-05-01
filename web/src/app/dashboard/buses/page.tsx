@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { 
-  Bus, 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Settings2, 
+import {
+  Bus,
+  Plus,
+  Search,
   Loader2,
   Trash2,
   Edit2,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
@@ -27,6 +26,7 @@ interface BusType {
   capacity: number;
   type: string;
   status: "active" | "maintenance" | "inactive";
+  seatsCount?: number;
 }
 
 export default function BusesManagement() {
@@ -55,12 +55,30 @@ export default function BusesManagement() {
     fetchBuses();
   }, []);
 
+  const handleInitSeats = async (bus: BusType) => {
+    try {
+      const cols = 4;
+      const rows = Math.ceil(bus.capacity / cols);
+      await api.post(`/buses/${bus.id}/seats/initialize`, { rows, cols });
+      fetchBuses();
+    } catch (err) {
+      console.error("Erreur initialisation sièges", err);
+    }
+  };
+
   const handleAddBus = async () => {
     try {
-      await api.post("/buses", {
+      const res = await api.post("/buses", {
         ...newBus,
         companyId: user?.companyId
       });
+      const busId = res.data.data?.id;
+      if (busId) {
+        // 4 cols (2+allée+2), rows calculées selon capacité
+        const cols = 4;
+        const rows = Math.ceil(newBus.capacity / cols);
+        await api.post(`/buses/${busId}/seats/initialize`, { rows, cols });
+      }
       setIsModalOpen(false);
       fetchBuses();
     } catch (err) {
@@ -131,6 +149,9 @@ export default function BusesManagement() {
                       </td>
                       <td className="py-6 text-center">
                         <span className="bg-surface px-3 py-1 rounded-lg text-xs font-black">{bus.capacity} sièges</span>
+                        {(bus.seatsCount === 0 || bus.seatsCount == null) && (
+                          <span className="ml-2 text-[10px] text-red-400 font-bold">Aucun plan</span>
+                        )}
                       </td>
                       <td className="py-6">
                         <Badge variant={bus.status === "active" ? "success" : bus.status === "maintenance" ? "warning" : "default"}>
@@ -139,6 +160,17 @@ export default function BusesManagement() {
                       </td>
                       <td className="py-6 text-right pr-4">
                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {(bus.seatsCount === 0 || bus.seatsCount == null) && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-lg border border-primary/30 text-primary hover:bg-primary/5"
+                              title="Initialiser les sièges"
+                              onClick={() => handleInitSeats(bus)}
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
                           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg border border-border">
                             <Edit2 className="w-3.5 h-3.5" />
                           </Button>
