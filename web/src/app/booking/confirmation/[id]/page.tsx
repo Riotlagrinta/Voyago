@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   Bus, CheckCircle2, Calendar, MapPin, User as UserIcon,
-  Download, ArrowRight, Loader2, Share2, Hash,
+  Download, ArrowRight, Loader2, Share2, Hash, Navigation,
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 
@@ -22,7 +22,9 @@ interface Booking {
   passengerName: string | null;
   passengerPhone: string | null;
   qrCode: string | null;
+  scheduleId: string;
   schedule: {
+    id?: string;
     departureTime: string;
     route: {
       departureStation: { name: string; city: string };
@@ -257,6 +259,14 @@ export default function ConfirmationPage() {
             onClick={() => router.push("/")}
           >
             Retour à l'accueil
+          </Button>
+          <Button
+            variant="outline"
+            className="rounded-2xl h-14 px-10 font-bold"
+            leftIcon={<Navigation className="w-5 h-5" />}
+            onClick={() => router.push(`/tracking/${booking.scheduleId}`)}
+          >
+            Suivre en direct
           </Button>
           <Button
             variant="ghost"
