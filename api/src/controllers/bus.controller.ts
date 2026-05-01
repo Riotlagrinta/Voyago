@@ -193,10 +193,32 @@ export const createBus = async (req: Request, res: Response, next: NextFunction)
       },
     });
 
+    // Auto-initialiser les sièges (4 colonnes, disposition 2+allée+2)
+    const cols = 4;
+    const rows = Math.ceil(bus.capacity / cols);
+    const seatsData = [];
+    let seatNumber = 1;
+    for (let r = 1; r <= rows; r++) {
+      for (let c = 1; c <= cols; c++) {
+        if (seatNumber <= bus.capacity) {
+          seatsData.push({
+            busId: bus.id,
+            seatNumber: seatNumber++,
+            rowPos: r,
+            colPos: c,
+            type: SeatType.standard,
+          });
+        }
+      }
+    }
+    if (seatsData.length > 0) {
+      await prismaClient.seat.createMany({ data: seatsData });
+    }
+
     res.status(201).json({
       success: true,
       message: 'Bus créé avec succès.',
-      data: formatBus(bus),
+      data: formatBus({ ...bus, _count: { seats: seatsData.length, schedules: 0 } }),
     });
   } catch (error) {
     handlePrismaError(error, next);

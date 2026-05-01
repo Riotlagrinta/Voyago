@@ -124,14 +124,17 @@ export const getScheduleSeats = async (req: Request, res: Response, next: NextFu
   try {
     const schedule = await prisma.schedule.findUnique({
       where: { id: req.params.id },
-      select: { busId: true },
+      select: {
+        busId: true,
+        bus: { select: { capacity: true } },
+      },
     });
 
     if (!schedule) {
       return next(createError('Trajet non trouvé.', 404));
     }
 
-    const seats = await prisma.seat.findMany({
+    let seats = await prisma.seat.findMany({
       where: { busId: schedule.busId },
       orderBy: [{ rowPos: 'asc' }, { colPos: 'asc' }],
       include: {
@@ -144,6 +147,42 @@ export const getScheduleSeats = async (req: Request, res: Response, next: NextFu
         },
       },
     });
+
+    // Si le bus n'a pas de sièges, les initialiser automatiquement
+    if (seats.length === 0 && schedule.bus.capacity > 0) {
+      const cols = 4;
+      const rows = Math.ceil(schedule.bus.capacity / cols);
+      const seatsData = [];
+      let seatNumber = 1;
+      for (let r = 1; r <= rows; r++) {
+        for (let c = 1; c <= cols; c++) {
+          if (seatNumber <= schedule.bus.capacity) {
+            seatsData.push({
+              busId: schedule.busId,
+              seatNumber: seatNumber++,
+              rowPos: r,
+              colPos: c,
+              type: 'standard' as const,
+            });
+          }
+        }
+      }
+      await prisma.seat.createMany({ data: seatsData });
+
+      seats = await prisma.seat.findMany({
+        where: { busId: schedule.busId },
+        orderBy: [{ rowPos: 'asc' }, { colPos: 'asc' }],
+        include: {
+          bookings: {
+            where: {
+              scheduleId: req.params.id,
+              status: { in: ['pending', 'confirmed'] },
+            },
+            select: { id: true, status: true },
+          },
+        },
+      });
+    }
 
     const formattedSeats = seats.map(seat => ({
       id: seat.id,
