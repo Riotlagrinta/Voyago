@@ -76,6 +76,16 @@ export default function RoutesManagement() {
     }
   };
 
+  const handleDeleteRoute = async (routeId: string) => {
+    if (!confirm("Supprimer cet itinéraire ? Tous les horaires associés seront également supprimés.")) return;
+    try {
+      await api.delete(`/routes/${routeId}`);
+      fetchData();
+    } catch (err) {
+      console.error("Erreur suppression itinéraire", err);
+    }
+  };
+
   return (
     <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -106,7 +116,12 @@ export default function RoutesManagement() {
                   <div className="w-12 h-12 rounded-2xl bg-white border border-border flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                     <RouteIcon className="w-6 h-6" />
                   </div>
-                  <Button variant="ghost" size="icon" className="rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleDeleteRoute(route.id)}
+                  >
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </Button>
                 </div>

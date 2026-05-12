@@ -14,7 +14,11 @@
     "migrate:rollback": "tsx src/db/rollback.ts",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
-    "prisma:dbpull": "prisma db pull"
+    "prisma:dbpull": "prisma db pull",
+    "seed": "tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.7.0",

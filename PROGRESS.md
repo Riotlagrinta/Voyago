@@ -1,7 +1,7 @@
 # ✅ Voyago — Suivi des Tâches
 
-> Dernière mise à jour : 2026-05-01
-> **Progression globale** : 51/85 tâches complétées
+> Dernière mise à jour : 2026-05-12
+> **Progression globale** : 60/85 tâches complétées
 
 ---
 
@@ -120,9 +120,9 @@
 
 | Priorité | # | Tâche | Détail |
 |----------|---|-------|--------|
-| 🔴 | C.1 | **Seed base de données** | 1 user, 1 company, 2 trajets en base. Un visiteur voit une liste vide. Ajouter des compagnies, stations et trajets réels du Togo |
+| ✅ | C.1 | **Seed base de données** | `api/prisma/seed.ts` créé — 2 compagnies (STIF, Trans Togo), 8 stations, 4 routes, 7×7 horaires, 3 comptes de test | 2026-05-12 |
 | 🔴 | C.2 | **Réactiver l'authentification** | Auth désactivée temporairement. Remettre les guards sur les routes protégées une fois les données en place |
-| 🔴 | C.3 | **Fixer JWT_SECRET sur Render** | Actuellement `generateValue: true` — secret regénéré à chaque redéploiement, tous les tokens existants deviennent invalides. Mettre une valeur fixe dans les variables Render |
+| ✅ | C.3 | **Fixer JWT_SECRET sur Render** | `render.yaml` : `generateValue: true` → `sync: false`. Fixer manuellement dans les variables Render. | 2026-05-12 |
 | 🔴 | C.4 | **Intégration paiement réel** | `PaymentService` utilise un `MockProvider`. Intégrer CinetPay, Notchpay ou un provider Mobile Money Togo réel |
 
 ---
@@ -131,9 +131,9 @@
 
 | Priorité | # | Tâche | Détail |
 |----------|---|-------|--------|
-| 🟡 | I.1 | **Redirect après login** | `/login?redirect=/bookings` existe mais après connexion l'utilisateur n'est pas renvoyé vers la page d'origine |
-| 🟡 | I.2 | **Dashboard — données réelles** | Les graphiques du dashboard utilisent des données hardcodées, pas la vraie DB |
-| 🟡 | I.3 | **Dashboard — boutons Modifier/Supprimer** | Dans buses, drivers, routes — les boutons existent mais n'ont pas de handlers |
+| ✅ | I.1 | **Redirect après login** | `login` et `register` lisent `?redirect=` et redirigent après connexion. Guard ajouté sur `/bookings`. | 2026-05-12 |
+| ✅ | I.2 | **Dashboard — données réelles** | API stats enrichie (chartData 7j, popularRoutes, recentBookings). Dashboard mis à jour. | 2026-05-12 |
+| ✅ | I.3 | **Dashboard — boutons Modifier/Supprimer** | Buses, drivers (edit+delete), routes (delete) — tous fonctionnels avec modals. | 2026-05-12 |
 | 🟡 | I.4 | **Simulateur GPS accessible** | `DriverSimulator.tsx` existe mais n'est pas facilement accessible pour tester le tracking en temps réel |
 | 🟡 | I.5 | **Clé Resend de production** | `RESEND_API_KEY` est une clé de test — les emails de confirmation ne sont pas envoyés en prod |
 
@@ -143,9 +143,9 @@
 
 | Priorité | # | Tâche | Détail |
 |----------|---|-------|--------|
-| 🟢 | F.1 | **SEO — metadata** | Aucune balise `<title>` ni `<description>` dans les pages Next.js |
-| 🟢 | F.2 | **Page 404 personnalisée** | Actuellement la 404 par défaut de Next.js |
-| 🟢 | F.3 | **Pages légales** | Les liens `/legal`, `/confidentialite`, `/cookies` existent dans le footer mais les pages sont vides |
+| ✅ | F.1 | **SEO — metadata** | `layout.tsx` créés pour search, login, register, bookings, compagnies, profile, legal, confidentialite, cookies | 2026-05-12 |
+| ✅ | F.2 | **Page 404 personnalisée** | `not-found.tsx` animé (bus + Framer Motion) déjà en place |
+| ✅ | F.3 | **Pages légales** | `/legal`, `/confidentialite`, `/cookies` — pages complètes en place |
 | 🟢 | F.4 | **Tests mobile sur device réel** | L'app Expo est écrite mais jamais testée sur Android/iOS |
 | 🟢 | F.5 | **Écran GPS mobile** | Page `/tracking/[scheduleId]` non portée sur mobile |
 

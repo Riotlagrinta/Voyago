@@ -19,7 +19,7 @@ import { Modal } from "@/components/ui/Modal";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/useAuthStore";
 
-interface BusType {
+interface BusItem {
   id: string;
   plateNumber: string;
   capacity: number;
@@ -30,22 +30,29 @@ interface BusType {
 
 export default function BusesManagement() {
   const { user } = useAuthStore();
-  const [buses, setBuses] = useState<BusType[]>([]);
+  const [buses, setBuses] = useState<BusItem[]>([]);
+  const [filtered, setFiltered] = useState<BusItem[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Add modal
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [newBus, setNewBus] = useState({
-    plateNumber: "",
-    capacity: 50,
-    type: "standard",
-  });
+  const [newBus, setNewBus] = useState({ plateNumber: "", capacity: 50, type: "standard" });
+
+  // Edit modal
+  const [editBus, setEditBus] = useState<BusItem | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const fetchBuses = async () => {
     if (!user?.companyId) return;
     try {
       const response = await api.get(`/buses/company/${user.companyId}`);
-      setBuses(response.data.data || []);
+      const data: BusItem[] = response.data.data || [];
+      setBuses(data);
+      setFiltered(data);
     } catch (err) {
       console.error("Erreur chargement bus", err);
     } finally {
@@ -57,6 +64,11 @@ export default function BusesManagement() {
     fetchBuses();
   }, [user?.companyId]);
 
+  useEffect(() => {
+    const q = search.toLowerCase();
+    setFiltered(buses.filter(b => b.plateNumber.toLowerCase().includes(q)));
+  }, [search, buses]);
+
   const handleAddBus = async () => {
     if (!user?.companyId) return;
     if (!newBus.plateNumber.trim()) {
@@ -67,7 +79,7 @@ export default function BusesManagement() {
     setFormError(null);
     try {
       await api.post(`/buses/company/${user.companyId}`, newBus);
-      setIsModalOpen(false);
+      setIsAddOpen(false);
       setNewBus({ plateNumber: "", capacity: 50, type: "standard" });
       fetchBuses();
     } catch (err: any) {
@@ -78,6 +90,7 @@ export default function BusesManagement() {
   };
 
   const handleDeleteBus = async (busId: string) => {
+    if (!confirm("Supprimer ce bus ? Cette action est irréversible.")) return;
     try {
       await api.delete(`/buses/${busId}`);
       fetchBuses();
@@ -85,6 +98,29 @@ export default function BusesManagement() {
       console.error("Erreur suppression bus", err);
     }
   };
+
+  const handleEditSave = async () => {
+    if (!editBus) return;
+    setEditSubmitting(true);
+    setEditError(null);
+    try {
+      await api.put(`/buses/${editBus.id}`, {
+        plateNumber: editBus.plateNumber,
+        capacity: editBus.capacity,
+        type: editBus.type,
+        status: editBus.status,
+      });
+      setEditBus(null);
+      fetchBuses();
+    } catch (err: any) {
+      setEditError(err.response?.data?.message || "Erreur lors de la modification.");
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
+
+  const statusLabel = (s: string) =>
+    s === "active" ? "Actif" : s === "maintenance" ? "Maintenance" : "Inactif";
 
   return (
     <div className="space-y-8">
@@ -94,7 +130,7 @@ export default function BusesManagement() {
           <p className="text-foreground/40 font-medium">Gérez vos véhicules et leur état de service.</p>
         </div>
         <Button
-          onClick={() => { setFormError(null); setIsModalOpen(true); }}
+          onClick={() => { setFormError(null); setIsAddOpen(true); }}
           className="rounded-2xl h-14 px-8 font-bold shadow-lg shadow-primary/20"
           leftIcon={<Plus className="w-5 h-5" />}
         >
@@ -109,6 +145,8 @@ export default function BusesManagement() {
             <input
               type="text"
               placeholder="Rechercher par immatriculation..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-surface border border-border rounded-2xl py-3 pl-12 pr-4 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
@@ -133,8 +171,8 @@ export default function BusesManagement() {
                 </tr>
               </thead>
               <tbody className="text-sm font-medium">
-                {buses.length > 0 ? (
-                  buses.map((bus) => (
+                {filtered.length > 0 ? (
+                  filtered.map((bus) => (
                     <tr key={bus.id} className="border-b border-surface last:border-none group hover:bg-surface transition-colors">
                       <td className="py-6 pl-4 font-bold tracking-wider">{bus.plateNumber}</td>
                       <td className="py-6">
@@ -155,12 +193,17 @@ export default function BusesManagement() {
                       </td>
                       <td className="py-6">
                         <Badge variant={bus.status === "active" ? "success" : bus.status === "maintenance" ? "warning" : "default"}>
-                          {bus.status === "active" ? "Actif" : bus.status === "maintenance" ? "Maintenance" : "Inactif"}
+                          {statusLabel(bus.status)}
                         </Badge>
                       </td>
                       <td className="py-6 text-right pr-4">
                         <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg border border-border">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-lg border border-border"
+                            onClick={() => { setEditError(null); setEditBus({ ...bus }); }}
+                          >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Button>
                           <Button
@@ -191,13 +234,14 @@ export default function BusesManagement() {
         )}
       </Card>
 
+      {/* Add Bus Modal */}
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
         title="Ajouter un nouveau bus"
         footer={
           <>
-            <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Annuler</Button>
+            <Button variant="ghost" onClick={() => setIsAddOpen(false)}>Annuler</Button>
             <Button onClick={handleAddBus} className="px-8" isLoading={submitting}>
               Confirmer l'ajout
             </Button>
@@ -231,13 +275,11 @@ export default function BusesManagement() {
               onChange={(e) => setNewBus({ ...newBus, capacity: parseInt(e.target.value) || 1 })}
             />
           </div>
-
           {formError && (
             <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs flex items-center gap-2 border border-red-100">
               <AlertCircle className="w-4 h-4 flex-shrink-0" /> {formError}
             </div>
           )}
-
           <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
             <p className="text-xs text-foreground/60 leading-relaxed">
@@ -245,6 +287,68 @@ export default function BusesManagement() {
             </p>
           </div>
         </div>
+      </Modal>
+
+      {/* Edit Bus Modal */}
+      <Modal
+        isOpen={!!editBus}
+        onClose={() => setEditBus(null)}
+        title="Modifier le bus"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setEditBus(null)}>Annuler</Button>
+            <Button onClick={handleEditSave} className="px-8" isLoading={editSubmitting}>
+              Enregistrer
+            </Button>
+          </>
+        }
+      >
+        {editBus && (
+          <div className="space-y-6">
+            <Input
+              label="Numéro d'immatriculation"
+              value={editBus.plateNumber}
+              onChange={(e) => setEditBus({ ...editBus, plateNumber: e.target.value })}
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground/80 ml-1">Type de bus</label>
+                <select
+                  className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  value={editBus.type}
+                  onChange={(e) => setEditBus({ ...editBus, type: e.target.value })}
+                >
+                  <option value="standard">Standard</option>
+                  <option value="vip">VIP</option>
+                  <option value="climatise">Climatisé</option>
+                </select>
+              </div>
+              <Input
+                label="Nombre de places"
+                type="number"
+                value={editBus.capacity}
+                onChange={(e) => setEditBus({ ...editBus, capacity: parseInt(e.target.value) || 1 })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground/80 ml-1">Statut</label>
+              <select
+                className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                value={editBus.status}
+                onChange={(e) => setEditBus({ ...editBus, status: e.target.value as BusItem["status"] })}
+              >
+                <option value="active">Actif</option>
+                <option value="maintenance">En maintenance</option>
+                <option value="inactive">Inactif</option>
+              </select>
+            </div>
+            {editError && (
+              <div className="p-3 bg-red-50 text-red-600 rounded-xl text-xs flex items-center gap-2 border border-red-100">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" /> {editError}
+              </div>
+            )}
+          </div>
+        )}
       </Modal>
     </div>
   );

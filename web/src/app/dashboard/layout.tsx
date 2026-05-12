@@ -3,19 +3,18 @@
 import React, { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { 
-  LayoutDashboard, 
-  Bus, 
-  MapPin, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  Bus,
+  Users,
+  BarChart3,
+  Settings,
+  LogOut,
   Calendar,
   ChevronRight,
   Menu,
   X,
-  User as UserIcon
+  Navigation,
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/useAuthStore";
@@ -27,6 +26,7 @@ const menuItems = [
   { icon: Calendar, label: "Planning & Trajets", href: "/dashboard/schedules" },
   { icon: Bus, label: "Ma Flotte", href: "/dashboard/buses" },
   { icon: Users, label: "Chauffeurs", href: "/dashboard/drivers" },
+  { icon: Navigation, label: "Simulateur GPS", href: "/dashboard/simulator" },
   { icon: BarChart3, label: "Ventes & Rapports", href: "/dashboard/reports" },
   { icon: Settings, label: "Paramètres", href: "/dashboard/settings" },
 ];

@@ -135,8 +135,8 @@ export default function SchedulesManagement() {
             <CalendarIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-foreground/40 uppercase">Aujourd'hui</p>
-            <h4 className="text-xl font-black">12 Départs</h4>
+            <p className="text-[10px] font-bold text-foreground/40 uppercase">Total trajets</p>
+            <h4 className="text-xl font-black">{schedules.length} Départs</h4>
           </div>
         </Card>
         <Card className="p-6 border-none shadow-voyago rounded-3xl bg-white flex items-center gap-4">
@@ -144,8 +144,8 @@ export default function SchedulesManagement() {
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-foreground/40 uppercase">Réservations</p>
-            <h4 className="text-xl font-black">156 Passagers</h4>
+            <p className="text-[10px] font-bold text-foreground/40 uppercase">En cours</p>
+            <h4 className="text-xl font-black">{schedules.filter(s => s.status === "ongoing").length} Actifs</h4>
           </div>
         </Card>
         <Card className="p-6 border-none shadow-voyago rounded-3xl bg-white flex items-center gap-4">
@@ -153,8 +153,8 @@ export default function SchedulesManagement() {
             <Clock className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-foreground/40 uppercase">Taux remplissage</p>
-            <h4 className="text-xl font-black">78% Moyenne</h4>
+            <p className="text-[10px] font-bold text-foreground/40 uppercase">Programmés</p>
+            <h4 className="text-xl font-black">{schedules.filter(s => s.status === "scheduled").length} Prévus</h4>
           </div>
         </Card>
       </div>

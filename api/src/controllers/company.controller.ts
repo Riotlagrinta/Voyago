@@ -170,7 +170,7 @@ export const deleteGalleryImage = async (req: Request, res: Response, next: Next
   }
 };
 
-export const getCompanyStats = async (req: Request, res: Response, next: NextFunction) => { 
+export const getCompanyStats = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const companyId = req.params.companyId || req.user?.companyId;
 
@@ -178,39 +178,162 @@ export const getCompanyStats = async (req: Request, res: Response, next: NextFun
       return next(createError('ID de compagnie manquant', 400));
     }
 
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
     const [
-      busesCount,
+      activeBuses,
       driversCount,
       routesCount,
       schedulesCount,
-      bookingsCount,
-      revenueResult
+      totalBookings,
+      revenueResult,
+      uniquePassengersResult,
+      recentBookings,
+      allRoutes,
     ] = await Promise.all([
-      prisma.bus.count({ where: { companyId } }),
+      prisma.bus.count({ where: { companyId, status: 'active' } }),
       prisma.driver.count({ where: { companyId } }),
       prisma.route.count({ where: { companyId } }),
       prisma.schedule.count({ where: { route: { companyId } } }),
-      prisma.booking.count({ where: { schedule: { route: { companyId } } } }),
+      prisma.booking.count({
+        where: {
+          schedule: { route: { companyId } },
+          createdAt: { gte: thirtyDaysAgo },
+          status: { not: 'cancelled' },
+        }
+      }),
       prisma.payment.aggregate({
         where: {
           booking: { schedule: { route: { companyId } } },
-          status: 'completed'
+          status: 'completed',
+          createdAt: { gte: thirtyDaysAgo },
         },
         _sum: { amount: true }
-      })
+      }),
+      prisma.booking.findMany({
+        where: {
+          schedule: { route: { companyId } },
+          createdAt: { gte: thirtyDaysAgo },
+          status: { not: 'cancelled' },
+        },
+        select: { userId: true },
+        distinct: ['userId'],
+      }),
+      prisma.booking.findMany({
+        where: { schedule: { route: { companyId } } },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        include: {
+          schedule: {
+            include: {
+              route: {
+                include: {
+                  departureStation: true,
+                  arrivalStation: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      prisma.route.findMany({
+        where: { companyId },
+        include: {
+          departureStation: true,
+          arrivalStation: true,
+          _count: {
+            select: {
+              schedules: {
+                where: {
+                  bookings: {
+                    some: { status: { not: 'cancelled' } },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: 'asc' },
+      }),
     ]);
 
-    res.json({ 
-      success: true, 
-      data: { 
-        busesCount,
+    // Build 7-day revenue chart data
+    const dayLabels = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+    const chartData: { name: string; total: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const day = new Date();
+      day.setDate(day.getDate() - i);
+      const dayStart = new Date(day);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(day);
+      dayEnd.setHours(23, 59, 59, 999);
+
+      const dayRevenue = await prisma.payment.aggregate({
+        where: {
+          booking: { schedule: { route: { companyId } } },
+          status: 'completed',
+          createdAt: { gte: dayStart, lte: dayEnd },
+        },
+        _sum: { amount: true },
+      });
+      chartData.push({
+        name: dayLabels[day.getDay()],
+        total: Number(dayRevenue._sum.amount || 0),
+      });
+    }
+
+    // Popular routes by booking count
+    const routeBookingCounts = await Promise.all(
+      allRoutes.map(async (route) => {
+        const count = await prisma.booking.count({
+          where: {
+            schedule: { routeId: route.id },
+            status: { not: 'cancelled' },
+          },
+        });
+        return {
+          route: `${route.departureStation.city} ↔ ${route.arrivalStation.city}`,
+          count,
+        };
+      })
+    );
+    const popularRoutes = routeBookingCounts
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 4);
+
+    res.json({
+      success: true,
+      data: {
+        // KPI cards
+        totalRevenue: Number(revenueResult._sum.amount || 0),
+        totalBookings,
+        activeBuses,
+        uniquePassengers: uniquePassengersResult.length,
+        // Legacy fields
+        busesCount: activeBuses,
         driversCount,
         routesCount,
         schedulesCount,
-        bookingsCount,
-        revenue: Number(revenueResult._sum.amount || 0)
-      } 
-    }); 
+        bookingsCount: totalBookings,
+        revenue: Number(revenueResult._sum.amount || 0),
+        // Charts
+        chartData,
+        popularRoutes,
+        recentBookings: recentBookings.map(b => ({
+          id: b.id,
+          seatNumber: b.seatNumber,
+          status: b.status,
+          totalPrice: b.totalPrice,
+          passengerName: b.passengerName,
+          createdAt: b.createdAt,
+          route: `${b.schedule.route.departureStation.city} ↔ ${b.schedule.route.arrivalStation.city}`,
+        })),
+      }
+    });
   } catch (error) {
     next(error);
   }
