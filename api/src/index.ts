@@ -36,16 +36,13 @@ const httpServer = createServer(app);
 
 // ─── CORS ───────────────────────────────────────────────────────────
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
+  ...(process.env.NODE_ENV !== 'production' ? ['http://localhost:3000', 'http://localhost:3001'] : []),
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
 ].filter(Boolean);
 
 const isAllowedOrigin = (origin: string) => {
-  if (allowedOrigins.includes(origin)) return true;
-  // Autoriser tous les sous-domaines *.vercel.app
-  if (/^https:\/\/[\w-]+\.vercel\.app$/.test(origin)) return true;
-  return false;
+  return allowedOrigins.includes(origin);
 };
 
 // ─── Socket.io (GPS temps réel) ────────────────────────────────────
@@ -56,6 +53,7 @@ export const io = new SocketServer(httpServer, {
       else callback(new Error(`CORS bloqué: ${origin}`));
     },
     methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   },
 });
@@ -63,9 +61,33 @@ export const io = new SocketServer(httpServer, {
 setupSocketHandlers(io);
 
 // ─── Middlewares globaux ────────────────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+    },
+  },
+  frameguard: { action: 'deny' },
+  hsts: { maxAge: 63072000, includeSubDomains: true, preload: true },
+}));
 app.use(compression());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+app.use((_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -75,7 +97,10 @@ app.use(cors({
       callback(new Error(`CORS bloqué pour l'origine: ${origin}`));
     }
   },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
+  maxAge: 86400,
 }));
 
 // Rate limit général
@@ -121,8 +146,6 @@ app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     service: 'voyago-api',
-    version: '1.0.0',
-    timestamp: new Date().toISOString(),
   });
 });
 
