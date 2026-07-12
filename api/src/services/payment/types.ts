@@ -1,4 +1,4 @@
-import { PaymentMethod, PaymentStatus } from '@prisma/client';
+import { PaymentMethod, PaymentStatus } from './PaymentService';
 
 export interface PaymentRequest {
   amount: number;

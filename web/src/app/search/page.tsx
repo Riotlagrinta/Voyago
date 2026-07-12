@@ -152,7 +152,7 @@ function SearchResultsContent() {
 
   useEffect(() => {
     fetchSchedules(departure, arrival, date);
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = () => {
     const params = new URLSearchParams();

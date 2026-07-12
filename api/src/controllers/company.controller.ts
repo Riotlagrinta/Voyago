@@ -288,7 +288,7 @@ export const getCompanyStats = async (req: Request, res: Response, next: NextFun
 
     // Popular routes by booking count
     const routeBookingCounts = await Promise.all(
-      allRoutes.map(async (route) => {
+      allRoutes.map(async (route: any) => {
         const count = await prisma.booking.count({
           where: {
             schedule: { routeId: route.id },
@@ -302,7 +302,7 @@ export const getCompanyStats = async (req: Request, res: Response, next: NextFun
       })
     );
     const popularRoutes = routeBookingCounts
-      .sort((a, b) => b.count - a.count)
+      .sort((a: any, b: any) => b.count - a.count)
       .slice(0, 4);
 
     res.json({
@@ -323,7 +323,7 @@ export const getCompanyStats = async (req: Request, res: Response, next: NextFun
         // Charts
         chartData,
         popularRoutes,
-        recentBookings: recentBookings.map(b => ({
+        recentBookings: recentBookings.map((b: any) => ({
           id: b.id,
           seatNumber: b.seatNumber,
           status: b.status,

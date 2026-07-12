@@ -23,7 +23,7 @@ export async function releaseExpiredLocks(): Promise<void> {
 
     await prisma.$transaction([
       prisma.booking.updateMany({
-        where: { id: { in: expired.map(b => b.id) } },
+        where: { id: { in: expired.map((b: any) => b.id) } },
         data: { status: 'cancelled' },
       }),
       ...Array.from(scheduleGroups.entries()).map(([scheduleId, count]) =>

@@ -83,7 +83,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
     const seatIds = seats.map(s => s.seatId);
     const lockedUntil = new Date(Date.now() + 15 * 60 * 1000);
 
-    const bookings = await prisma.$transaction(async (tx) => {
+    const bookings = await prisma.$transaction(async (tx: any) => {
       // 1. Lire le trajet
       const schedule = await tx.schedule.findUnique({
         where: { id: scheduleId },
@@ -127,7 +127,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
         throw Object.assign(new Error('Un ou plusieurs sièges sont introuvables.'), { statusCode: 400 });
       }
 
-      const seatMap = new Map(seatRecords.map(s => [s.id, s]));
+      const seatMap = new Map<string, any>(seatRecords.map((s: any) => [s.id, s]));
 
       // 4. Créer les réservations
       const created = await Promise.all(

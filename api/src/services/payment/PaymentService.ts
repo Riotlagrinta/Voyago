@@ -1,4 +1,5 @@
 import { PaymentStatus, BookingStatus, PaymentMethod } from '@prisma/client';
+export { PaymentStatus, BookingStatus, PaymentMethod };
 import { PaymentFactory } from './PaymentFactory';
 import { PaymentRequest } from './types';
 import { prisma } from '../../lib/prisma';
@@ -50,7 +51,7 @@ export class PaymentService {
     }
 
     // 4. Mettre à jour payment + booking dans une transaction atomique
-    const updatedPayment = await prisma.$transaction(async (tx) => {
+    const updatedPayment = await prisma.$transaction(async (tx: any) => {
       const updated = await tx.payment.update({
         where: { id: payment.id },
         data: {
@@ -118,7 +119,7 @@ export class PaymentService {
     const response = await provider.checkStatus(payment.reference);
 
     if (response.status !== payment.status) {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await tx.payment.update({ where: { id: paymentId }, data: { status: response.status } });
 
         if (

@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../index';
 import { prisma as prismaMock } from '../lib/prisma';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../lib/secrets';
 
 describe('Booking Endpoints', () => {
   const mockUser = {
@@ -11,7 +12,14 @@ describe('Booking Endpoints', () => {
     name: 'Passenger User',
   };
 
-  const token = jwt.sign(mockUser, process.env.JWT_SECRET || 'voyago-dev-secret');
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (prismaMock as any).$transaction = jest.fn().mockImplementation(async (callback: any) => {
+      return callback(prismaMock);
+    });
+  });
+
+  const token = jwt.sign(mockUser, JWT_SECRET);
 
   const validScheduleId = '550e8400-e29b-41d4-a716-446655440000';
   const validSeatId = '550e8400-e29b-41d4-a716-446655440001';
@@ -20,21 +28,24 @@ describe('Booking Endpoints', () => {
     it('should create a pending booking with 10min lock', async () => {
       const bookingData = {
         scheduleId: validScheduleId,
-        seatId: validSeatId,
+        seats: [{
+          seatId: validSeatId,
+          passengerName: 'Test Passager',
+          passengerPhone: '90123456'
+        }],
       };
 
       (prismaMock.schedule.findUnique as jest.Mock).mockResolvedValue({
         id: validScheduleId,
         price: 5000,
+        availableSeats: 40,
+        status: 'published',
       });
 
-      (prismaMock.seat.findUnique as jest.Mock).mockResolvedValue({
-        id: validSeatId,
-        seatNumber: 12,
-        busId: '550e8400-e29b-41d4-a716-446655440002',
-      });
-
-      (prismaMock.booking.findFirst as jest.Mock).mockResolvedValue(null);
+      (prismaMock.user.findFirst as jest.Mock).mockResolvedValue({ id: mockUser.id });
+      (prismaMock.seat.findMany as jest.Mock).mockResolvedValue([{ id: validSeatId, seatNumber: 12 }]);
+      (prismaMock.booking.findMany as jest.Mock).mockResolvedValue([]);
+      (prismaMock.schedule.update as jest.Mock).mockResolvedValue({});
       
       (prismaMock.booking.create as jest.Mock).mockResolvedValue({
         id: 'booking-id',
@@ -52,30 +63,39 @@ describe('Booking Endpoints', () => {
         .set('Authorization', `Bearer ${token}`)
         .send(bookingData);
 
+      if (res.status === 500) console.log('ERROR 1:', res.body);
+
       expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.status).toBe('pending');
-      expect(res.body.data).toHaveProperty('lockedUntil');
+      expect(res.body.data[0].status).toBe('pending');
+      expect(res.body.data[0]).toHaveProperty('lockedUntil');
     });
 
     it('should return 409 if seat is already taken', async () => {
       const bookingData = {
         scheduleId: validScheduleId,
-        seatId: validSeatId,
+        seats: [{
+          seatId: validSeatId,
+          passengerName: 'Test Passager',
+          passengerPhone: '90123456'
+        }],
       };
 
-      (prismaMock.schedule.findUnique as jest.Mock).mockResolvedValue({ id: validScheduleId });
-      (prismaMock.seat.findUnique as jest.Mock).mockResolvedValue({ id: validSeatId });
-      
-      (prismaMock.booking.findFirst as jest.Mock).mockResolvedValue({ 
-        id: 'existing-id',
-        status: 'confirmed'
+      (prismaMock.schedule.findUnique as jest.Mock).mockResolvedValue({
+        id: validScheduleId,
+        price: 5000,
+        availableSeats: 40,
+        status: 'published',
       });
+      (prismaMock.user.findFirst as jest.Mock).mockResolvedValue({ id: mockUser.id });
+      (prismaMock.booking.findMany as jest.Mock).mockResolvedValue([{ seatId: validSeatId }]);
 
       const res = await request(app)
         .post('/api/v1/bookings')
         .set('Authorization', `Bearer ${token}`)
         .send(bookingData);
+
+      if (res.status === 500) console.log('ERROR 2:', res.body);
 
       expect(res.status).toBe(409);
       expect(res.body.error).toMatch(/déjà réservé/);

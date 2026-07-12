@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../index';
 import { prisma as prismaMock } from '../lib/prisma';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../lib/secrets';
 
 describe('Company Endpoints', () => {
   const superAdmin = {
@@ -17,8 +18,8 @@ describe('Company Endpoints', () => {
     companyId: 'company-id',
   };
 
-  const adminToken = jwt.sign(superAdmin, process.env.JWT_SECRET || 'voyago-dev-secret');
-  const caToken = jwt.sign(companyAdmin, process.env.JWT_SECRET || 'voyago-dev-secret');
+  const adminToken = jwt.sign(superAdmin, JWT_SECRET);
+  const caToken = jwt.sign(companyAdmin, JWT_SECRET);
 
   describe('GET /api/v1/companies', () => {
     it('should return all active companies to public', async () => {
@@ -58,7 +59,7 @@ describe('Company Endpoints', () => {
     });
 
     it('should deny company creation to normal passenger', async () => {
-      const passengerToken = jwt.sign({ id: 'p', role: 'passenger' }, process.env.JWT_SECRET || 'voyago-dev-secret');
+      const passengerToken = jwt.sign({ id: 'p', role: 'passenger' }, JWT_SECRET);
 
       const res = await request(app)
         .post('/api/v1/companies')
@@ -82,6 +83,8 @@ describe('Company Endpoints', () => {
       (prismaMock.schedule.count as jest.Mock).mockResolvedValue(20);
       (prismaMock.booking.count as jest.Mock).mockResolvedValue(100);
       (prismaMock.payment.aggregate as jest.Mock).mockResolvedValue({ _sum: { amount: 500000 } });
+      (prismaMock.booking.findMany as jest.Mock).mockResolvedValue([]);
+      (prismaMock.route.findMany as jest.Mock).mockResolvedValue([]);
 
       const res = await request(app)
         .get('/api/v1/companies/company-id/stats')

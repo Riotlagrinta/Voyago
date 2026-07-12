@@ -1,4 +1,4 @@
-import { PaymentMethod } from '@prisma/client';
+import { PaymentMethod } from './PaymentService';
 import { IPaymentProvider } from './types';
 import { MockPaymentProvider } from './providers/MockPaymentProvider';
 

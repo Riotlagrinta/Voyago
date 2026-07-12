@@ -23,7 +23,7 @@ import routeRoutes from './routes/route.routes';
 import scheduleRoutes from './routes/schedule.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
-import emailTestRoutes from './routes/email.test';
+import emailTestRoutes from './routes/email.test-routes';
 
 // Import des middlewares
 import { errorHandler } from './middlewares/error.middleware';

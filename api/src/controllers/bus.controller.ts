@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma as prismaClient } from '../lib/prisma';
 import { createError } from '../middlewares/error.middleware';
-import { SeatType } from '@prisma/client';
+
 
 const busCreateSchema = z.object({
   plateNumber: z.string().trim().min(3, 'L’immatriculation est requise.').max(20),
@@ -206,7 +206,7 @@ export const createBus = async (req: Request, res: Response, next: NextFunction)
             seatNumber: seatNumber++,
             rowPos: r,
             colPos: c,
-            type: SeatType.standard,
+            type: 'standard' as any,
           });
         }
       }
@@ -316,7 +316,7 @@ export const initializeBusSeats = async (req: Request, res: Response, next: Next
             seatNumber: seatNumber++,
             rowPos: r,
             colPos: c,
-            type: SeatType.standard,
+            type: 'standard' as any,
           });
         }
       }

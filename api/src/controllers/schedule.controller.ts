@@ -96,7 +96,7 @@ export const getSchedules = async (req: Request, res: Response, next: NextFuncti
 
     res.json({
       success: true,
-      data: schedules.map(s => ({ ...s, company: s.route.company })),
+      data: schedules.map((s: any) => ({ ...s, company: s.route.company })),
     });
   } catch (error) {
     next(error);
@@ -184,7 +184,7 @@ export const getScheduleSeats = async (req: Request, res: Response, next: NextFu
       });
     }
 
-    const formattedSeats = seats.map(seat => ({
+    const formattedSeats = seats.map((seat: any) => ({
       id: seat.id,
       seatNumber: seat.seatNumber,
       type: seat.type,

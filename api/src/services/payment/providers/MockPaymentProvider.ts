@@ -1,4 +1,4 @@
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus } from '../PaymentService';
 import { IPaymentProvider, PaymentRequest, PaymentResponse } from '../types';
 
 /**
