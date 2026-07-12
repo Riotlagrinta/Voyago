@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://demotiles.maplibre.org https://*.tile.openstreetmap.org https://vercel.live https://*.vercel.live",
               "font-src 'self' data:",
-              "connect-src 'self' https://demotiles.maplibre.org https://*.supabase.co wss://*.supabase.co http://localhost:* ws://localhost:* https://voyago-api-2lcz.onrender.com wss://voyago-api-2lcz.onrender.com https://*.onrender.com wss://*.onrender.com https://vercel.live https://*.vercel.live",
+              "connect-src 'self' https://demotiles.maplibre.org https://*.supabase.co wss://*.supabase.co http://localhost:* ws://localhost:* https://voyago-api-2lcz.onrender.com wss://voyago-api-2lcz.onrender.com https://*.onrender.com wss://*.onrender.com https://vercel.live https://*.vercel.live https://*.vercel.app wss://*.vercel.app",
               "worker-src 'self' blob:",
               "frame-src 'self' https://vercel.live https://*.vercel.live",
               "frame-ancestors 'self' https://vercel.live https://*.vercel.live",
