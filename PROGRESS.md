@@ -1,7 +1,7 @@
 # ✅ Voyago — Suivi des Tâches
 
-> Dernière mise à jour : **2026-07-13**
-> **Progression globale** : 65/90 tâches complétées
+> Dernière mise à jour : 2026-07-12
+> **Progression globale** : 60/85 tâches complétées
 > 
 > > [!IMPORTANT]
 > > **Décision de méthodologie (2026-07-12)** : L'ensemble du développement (Frontend Web, API Express et Application Mobile) s'effectue désormais exclusivement en **local** sur de bonnes bases avant toute synchronisation avec la production.
@@ -61,7 +61,6 @@
 | ✅ | 1.16 | CORS multi-origines (*.vercel.app + localhost) | 2026-05-01 |
 | ✅ | 1.17 | Rate limiting + Helmet activés en production | 2026-05-01 |
 | ✅ | 1.18 | Fix dotenv chargé avant Prisma (résout ECONNREFUSED) | 2026-05-01 |
-| ✅ | 1.19 | **CRON Job — Génération automatique de trajets** | `api/src/jobs/scheduleGenerator.job.ts` — clone les trajets J+7 chaque nuit à minuit via `node-cron` | 2026-07-13 |
 
 ---
 
@@ -86,9 +85,6 @@
 | ✅ | 2.15 | Composant Ticket3D holographique (shader custom, QR réaliste) | 2026-05-01 |
 | ✅ | 2.16 | Composant RouteVisualization3D (bus animé sur courbe de Bézier) | 2026-05-01 |
 | ✅ | 2.17 | `useAuthStore` — suppression du guest super_admin par défaut | 2026-05-01 |
-| ✅ | 2.18 | **Mode Sombre (Dark Mode)** — `next-themes` + `ThemeProvider` + `ThemeToggle` | 2026-07-13 |
-| ✅ | 2.19 | **Variables CSS Dark Mode** — `globals.css` avec `@custom-variant dark` (Tailwind v4) | 2026-07-13 |
-| ✅ | 2.20 | **Correction erreur Worker 3D** — `transpilePackages` dans `next.config.ts` pour `@react-three/drei` | 2026-07-13 |
 
 ---
 
@@ -170,39 +166,13 @@
 | `mobile` — `npx tsc --noEmit` | ✅ | 2026-05-01 |
 | API prod (Render) — `/health` | ✅ | 2026-05-01 |
 | Web prod (Vercel) | 🔄 | 2026-05-01 |
-| Dark Mode — Toggle Fonctionnel | ✅ | 2026-07-13 |
-| CRON Job — Génération trajets | ✅ (testé manuellement) | 2026-07-13 |
-
----
-
-## 📝 Historique de session (2026-07-13)
-
-### Ce qui a été accompli ce soir :
-1. **Reconstruction du backend local** — Démarrage de Docker, configuration de la BDD PostgreSQL locale, migration Prisma et seed des données.
-2. **Test de réservation end-to-end** — Agent automatisé a réservé un billet avec succès (Lomé → Kara). Flux complet validé : recherche → sièges → paiement → confirmation QR code.
-3. **Diagnostic du manque de trajets** — Les schedules générés n'avaient pas de dates futures. Fix : création du CRON Job (`scheduleGenerator.job.ts`) pour cloner les trajets chaque nuit à minuit (J+7).
-4. **Implémentation du Mode Sombre** — Installation de `next-themes`, création de `ThemeProvider.tsx` et `ThemeToggle.tsx`, mise à jour de `globals.css` avec `@custom-variant dark` pour Tailwind CSS v4.
-5. **Correction erreur Worker 3D** — `transpilePackages` ajouté dans `next.config.ts` pour résoudre le crash des modules `@react-three/drei`.
-
-### Fichiers créés/modifiés :
-| Fichier | Action |
-|---------|--------|
-| `api/src/jobs/scheduleGenerator.job.ts` | ✅ Créé |
-| `api/src/index.ts` | ✅ Modifié (import CRON) |
-| `web/src/components/ThemeProvider.tsx` | ✅ Créé |
-| `web/src/components/ThemeToggle.tsx` | ✅ Créé |
-| `web/src/app/globals.css` | ✅ Modifié (dark mode vars) |
-| `web/src/app/layout.tsx` | ✅ Modifié (ThemeProvider wrapper) |
-| `web/src/app/page.tsx` | ✅ Modifié (ThemeToggle dans nav) |
-| `web/src/app/search/page.tsx` | ✅ Modifié (ThemeToggle dans search bar) |
-| `web/next.config.ts` | ✅ Modifié (transpilePackages 3D) |
 
 ---
 
 ## Légende
 
 | Icône | Signification |
-|-------|--------------| 
+|-------|--------------|
 | ✅ | Terminé |
 | 🔄 | En cours |
 | ⬜ | À faire |

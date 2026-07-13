@@ -23,6 +23,7 @@ import routeRoutes from './routes/route.routes';
 import scheduleRoutes from './routes/schedule.routes';
 import bookingRoutes from './routes/booking.routes';
 import paymentRoutes from './routes/payment.routes';
+// Route de test email — uniquement en développement
 import emailTestRoutes from './routes/email.test-routes';
 
 // Import des middlewares
@@ -140,7 +141,10 @@ app.use(`${API_PREFIX}/routes`, routeRoutes);
 app.use(`${API_PREFIX}/schedules`, scheduleRoutes);
 app.use(`${API_PREFIX}/bookings`, bookingRoutes);
 app.use(`${API_PREFIX}/payments`, paymentRoutes);
-app.use(`${API_PREFIX}/email-test`, emailTestRoutes);
+// Route de test email — désactivée en production
+if (process.env.NODE_ENV !== 'production') {
+  app.use(`${API_PREFIX}/email-test`, emailTestRoutes);
+}
 
 // Health check
 app.get('/health', (_req, res) => {
