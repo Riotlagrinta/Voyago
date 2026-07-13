@@ -37,8 +37,8 @@ export const Modal = ({ isOpen, onClose, title, children, footer }: ModalProps) 
       />
       
       {/* Content */}
-      <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg relative z-10 animate-in zoom-in-95 duration-200 overflow-hidden">
-        <div className="p-6 border-b border-surface flex items-center justify-between">
+      <div className="bg-surface text-foreground border border-border rounded-[2rem] shadow-2xl w-full max-w-lg relative z-10 animate-in zoom-in-95 duration-200 overflow-hidden">
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <h3 className="text-xl font-black">{title}</h3>
           <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl">
             <X className="w-5 h-5" />

@@ -9,7 +9,7 @@ export const Card = ({ className, hoverable = false, children, ...props }: CardP
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border bg-white p-4 shadow-sm transition-all duration-300",
+        "rounded-2xl border border-border bg-surface text-foreground p-4 shadow-sm transition-all duration-300",
         hoverable && "hover:shadow-voyago hover:-translate-y-1 cursor-pointer",
         className
       )}
