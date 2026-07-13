@@ -78,7 +78,8 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-surface">
       {/* Simple Header */}
-      <nav className="bg-white border-b border-border px-6 py-4">
+      {/* Simple Header */}
+      <nav className="bg-surface border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button onClick={() => router.back()} className="flex items-center gap-2 text-foreground/60 hover:text-primary font-bold transition-colors">
             <ChevronLeft className="w-5 h-5" /> Retour
@@ -96,10 +97,10 @@ export default function ProfilePage() {
           
           {/* Sidebar Nav */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-voyago border-none text-center relative overflow-hidden">
+            <div className="bg-surface p-8 rounded-[2.5rem] shadow-voyago border border-border text-center relative overflow-hidden">
                <div className="absolute top-0 left-0 w-full h-24 bg-primary/5" />
                <div className="relative">
-                  <div className="w-24 h-24 rounded-[2rem] bg-surface border-4 border-white shadow-xl mx-auto flex items-center justify-center text-3xl font-black text-primary overflow-hidden group">
+                  <div className="w-24 h-24 rounded-[2rem] bg-surface-50 border-4 border-surface shadow-xl mx-auto flex items-center justify-center text-3xl font-black text-primary overflow-hidden group">
                      {profileData.avatarUrl ? (
                        <img src={profileData.avatarUrl} className="w-full h-full object-cover" alt="" />
                      ) : user?.name.charAt(0)}
@@ -107,7 +108,7 @@ export default function ProfilePage() {
                         <Camera className="w-6 h-6" />
                      </button>
                   </div>
-                  <h3 className="mt-4 text-xl font-black text-slate-900">{user?.name}</h3>
+                  <h3 className="mt-4 text-xl font-black text-foreground">{user?.name}</h3>
                   <Badge variant="info" className="mt-1 font-black text-[10px] uppercase tracking-wider">{user?.role}</Badge>
                </div>
 
@@ -116,7 +117,7 @@ export default function ProfilePage() {
                     onClick={() => setActiveTab("general")}
                     className={cn(
                       "w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all",
-                      activeSection === "general" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-400 hover:bg-surface"
+                      activeSection === "general" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-foreground/60 hover:bg-surface-50"
                     )}
                   >
                     <UserIcon className="w-5 h-5" /> Mon Profil
@@ -125,7 +126,7 @@ export default function ProfilePage() {
                     onClick={() => setActiveTab("security")}
                     className={cn(
                       "w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all",
-                      activeSection === "security" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-slate-400 hover:bg-surface"
+                      activeSection === "security" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-foreground/60 hover:bg-surface-50"
                     )}
                   >
                     <Lock className="w-5 h-5" /> Sécurité
@@ -133,18 +134,18 @@ export default function ProfilePage() {
                </div>
             </div>
 
-            <div className="p-6 bg-slate-900 text-white rounded-[2rem] shadow-xl">
+            <div className="p-6 bg-surface-50 border border-border text-foreground rounded-[2rem] shadow-xl">
                <ShieldCheck className="w-8 h-8 text-primary mb-4" />
                <h4 className="font-black text-lg mb-2">Compte Sécurisé</h4>
-               <p className="text-xs text-slate-400 leading-relaxed">Vos données personnelles sont cryptées et protégées selon les normes de sécurité en vigueur au Togo.</p>
+               <p className="text-xs text-foreground/60 leading-relaxed">Vos données personnelles sont cryptées et protégées selon les normes de sécurité en vigueur au Togo.</p>
             </div>
           </div>
 
           {/* Form Content */}
           <div className="lg:col-span-8">
             {activeSection === "general" && (
-              <Card className="p-10 border-none shadow-voyago rounded-[2.5rem] bg-white animate-in fade-in slide-in-from-right-4 duration-300">
-                <h2 className="text-2xl font-black text-slate-900 mb-8">Informations Personnelles</h2>
+              <Card className="p-10 border border-border shadow-voyago rounded-[2.5rem] bg-surface animate-in fade-in slide-in-from-right-4 duration-300">
+                <h2 className="text-2xl font-black text-foreground mb-8">Informations Personnelles</h2>
                 
                 <div className="space-y-6">
                   <Input 
@@ -158,7 +159,7 @@ export default function ProfilePage() {
                     value={user?.email} 
                     disabled 
                     leftIcon={<Mail className="w-4 h-4" />}
-                    className="opacity-60 bg-surface"
+                    className="opacity-60 bg-surface-50"
                   />
                   <Input 
                     label="Numéro de téléphone (+228)" 
@@ -167,7 +168,7 @@ export default function ProfilePage() {
                     leftIcon={<Phone className="w-4 h-4" />}
                   />
                   
-                  <div className="pt-8 flex justify-end border-t border-surface">
+                  <div className="pt-8 flex justify-end border-t border-border">
                     <Button 
                       className="rounded-2xl h-14 px-10 font-black shadow-lg shadow-primary/20"
                       isLoading={loading}
@@ -182,8 +183,8 @@ export default function ProfilePage() {
             )}
 
             {activeSection === "security" && (
-              <Card className="p-10 border-none shadow-voyago rounded-[2.5rem] bg-white animate-in fade-in slide-in-from-right-4 duration-300">
-                <h2 className="text-2xl font-black text-slate-900 mb-8">Sécurité du compte</h2>
+              <Card className="p-10 border border-border shadow-voyago rounded-[2.5rem] bg-surface animate-in fade-in slide-in-from-right-4 duration-300">
+                <h2 className="text-2xl font-black text-foreground mb-8">Sécurité du compte</h2>
                 
                 <div className="space-y-6">
                   <Input 

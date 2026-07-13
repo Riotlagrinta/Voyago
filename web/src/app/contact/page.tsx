@@ -58,8 +58,8 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface">
-      <nav className="bg-white border-b border-border px-6 py-4">
+    <div className="min-h-screen bg-background text-foreground">
+      <nav className="bg-surface border-b border-border px-6 py-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
             <div className="bg-primary p-2 rounded-xl">
@@ -76,27 +76,27 @@ export default function ContactPage() {
       <main className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-16 space-y-4">
            <HelpCircle className="w-16 h-16 text-primary mx-auto opacity-20" />
-           <h1 className="text-5xl font-black text-slate-900 tracking-tight text-center">Comment pouvons-nous <br /> <span className="text-primary text-center">vous aider ?</span></h1>
-           <p className="text-slate-500 font-medium max-w-xl mx-auto">Trouvez des réponses rapides dans notre FAQ ou contactez notre équipe support disponible 7j/7.</p>
+           <h1 className="text-5xl font-black text-foreground tracking-tight text-center">Comment pouvons-nous <br /> <span className="text-primary text-center">vous aider ?</span></h1>
+           <p className="text-foreground/60 font-medium max-w-xl mx-auto">Trouvez des réponses rapides dans notre FAQ ou contactez notre équipe support disponible 7j/7.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
           {/* FAQ Section */}
           <div className="lg:col-span-7 space-y-6">
-            <h2 className="text-2xl font-black text-slate-900 mb-8 flex items-center gap-3">
+            <h2 className="text-2xl font-black text-foreground mb-8 flex items-center gap-3">
               <MessageSquare className="text-primary w-6 h-6" /> Questions Fréquentes
             </h2>
             
             <div className="space-y-4">
               {faqs.map((faq, i) => (
-                <div key={i} className="bg-white rounded-[2rem] border border-border overflow-hidden transition-all shadow-sm hover:shadow-md">
+                <div key={i} className="bg-surface rounded-[2rem] border border-border overflow-hidden transition-all shadow-sm hover:shadow-md">
                   <button 
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
                     className="w-full p-6 text-left flex items-center justify-between group"
                   >
-                    <span className="font-black text-slate-800 pr-8">{faq.q}</span>
-                    <div className={cn("p-2 rounded-xl transition-all", openFaq === i ? "bg-primary text-white" : "bg-surface text-slate-400 group-hover:bg-primary/10 group-hover:text-primary")}>
+                    <span className="font-black text-foreground pr-8">{faq.q}</span>
+                    <div className={cn("p-2 rounded-xl transition-all", openFaq === i ? "bg-primary text-white" : "bg-surface-50 text-foreground/40 group-hover:bg-primary/10 group-hover:text-primary")}>
                       {openFaq === i ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     </div>
                   </button>
@@ -108,7 +108,7 @@ export default function ContactPage() {
                         exit={{ height: 0, opacity: 0 }}
                         className="px-6 pb-6"
                       >
-                        <p className="text-slate-500 font-medium leading-relaxed border-t border-surface pt-4">{faq.a}</p>
+                        <p className="text-foreground/60 font-medium leading-relaxed border-t border-border pt-4">{faq.a}</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -116,13 +116,13 @@ export default function ContactPage() {
               ))}
             </div>
 
-            <div className="mt-12 p-8 bg-slate-900 rounded-[2.5rem] text-white flex flex-col md:flex-row items-center gap-8 shadow-xl">
+            <div className="mt-12 p-8 bg-surface-50 border border-border rounded-[2.5rem] text-foreground flex flex-col md:flex-row items-center gap-8 shadow-xl">
                <div className="bg-primary/20 p-4 rounded-3xl">
                   <Clock className="w-10 h-10 text-primary" />
                </div>
                <div>
                   <h4 className="font-black text-lg">Support Client Réactif</h4>
-                  <p className="text-slate-400 text-sm">Notre équipe est disponible de 06h à 22h pour vous assister dans vos réservations.</p>
+                  <p className="text-foreground/60 text-sm">Notre équipe est disponible de 06h à 22h pour vous assister dans vos réservations.</p>
                </div>
                <Button className="md:ml-auto rounded-2xl h-14 px-8 font-black whitespace-nowrap">Appeler le 90 00 00 00</Button>
             </div>
@@ -130,9 +130,9 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-5">
-            <Card className="p-10 border-none shadow-voyago rounded-[2.5rem] bg-white sticky top-24">
-              <h2 className="text-2xl font-black text-slate-900 mb-2 text-center">Écrivez-nous</h2>
-              <p className="text-slate-400 text-sm text-center mb-8">Une suggestion ou une réclamation ?</p>
+            <Card className="p-10 border border-border shadow-voyago rounded-[2.5rem] bg-surface sticky top-24">
+              <h2 className="text-2xl font-black text-foreground mb-2 text-center">Écrivez-nous</h2>
+              <p className="text-foreground/40 text-sm text-center mb-8">Une suggestion ou une réclamation ?</p>
               
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Input label="Votre Nom" placeholder="Nom complet" required />

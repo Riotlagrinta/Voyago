@@ -99,7 +99,7 @@ export default function MyBookingsPage() {
             </p>
           </div>
 
-          <div className="flex bg-white p-1.5 rounded-2xl border border-border shadow-sm">
+          <div className="flex bg-surface-50 p-1.5 rounded-2xl border border-border shadow-sm">
             {(["upcoming", "past"] as const).map(tab => (
               <button
                 key={tab}
@@ -127,19 +127,19 @@ export default function MyBookingsPage() {
                 <Card
                   key={booking.id}
                   hoverable
-                  className="p-0 overflow-hidden border-none shadow-voyago group cursor-pointer"
+                  className="p-0 overflow-hidden border border-border shadow-voyago group cursor-pointer bg-surface"
                   onClick={() => router.push(`/booking/confirmation/${booking.id}`)}
                 >
                   <div className="flex flex-col md:flex-row">
                     {/* Bloc date */}
-                    <div className="md:w-36 bg-surface border-b md:border-b-0 md:border-r border-border p-6 flex flex-col items-center justify-center text-center shrink-0">
+                    <div className="md:w-36 bg-surface-50 border-b md:border-b-0 md:border-r border-border p-6 flex flex-col items-center justify-center text-center shrink-0">
                       <p className="text-[10px] font-black uppercase text-foreground/30 mb-1 tracking-widest">Départ</p>
                       <p className="text-4xl font-black text-primary leading-none">{dept.getDate()}</p>
                       <p className="text-xs font-bold text-foreground/60 uppercase mt-1">
                         {dept.toLocaleDateString("fr-FR", { month: "short", year: "numeric" })}
                       </p>
-                      <div className="mt-3 flex items-center gap-1 text-xs font-black text-foreground/40 bg-white px-2.5 py-1 rounded-full border border-border">
-                        <Clock className="w-3 h-3" />
+                      <div className="mt-3 flex items-center gap-1 text-xs font-black text-foreground/60 bg-surface px-2.5 py-1 rounded-full border border-border">
+                        <Clock className="w-3 h-3 text-primary" />
                         {dept.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                       </div>
                     </div>
