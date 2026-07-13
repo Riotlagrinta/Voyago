@@ -153,7 +153,7 @@ export default function ConfirmationPage() {
         </div>
 
         {/* Carte ticket */}
-        <Card className="p-0 border-none shadow-voyago rounded-[2.5rem] overflow-hidden mb-8">
+        <Card className="p-0 border border-border shadow-voyago rounded-[2.5rem] overflow-hidden mb-8 bg-surface">
           {/* Header coloré */}
           <div className="bg-primary p-10 text-white relative overflow-hidden">
             <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
@@ -171,10 +171,10 @@ export default function ConfirmationPage() {
           </div>
 
           {/* Corps du ticket */}
-          <div className="p-10 bg-white relative space-y-8">
+          <div className="p-10 bg-surface relative space-y-8">
             {/* Encoches décoratives */}
-            <div className="absolute top-0 -left-4 w-8 h-8 bg-surface rounded-full -translate-y-1/2" />
-            <div className="absolute top-0 -right-4 w-8 h-8 bg-surface rounded-full -translate-y-1/2" />
+            <div className="absolute top-0 -left-4 w-8 h-8 bg-background rounded-full -translate-y-1/2 border-r border-border" />
+            <div className="absolute top-0 -right-4 w-8 h-8 bg-background rounded-full -translate-y-1/2 border-l border-border" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-6">
@@ -217,7 +217,7 @@ export default function ConfirmationPage() {
                 </div>
 
                 {/* QR Code + ID */}
-                <div className="bg-surface-100 p-5 rounded-3xl flex items-center justify-between border border-border/50">
+                <div className="bg-surface-50 p-5 rounded-3xl flex items-center justify-between border border-border">
                   <div>
                     <p className="text-[10px] font-black uppercase text-foreground/30 tracking-widest mb-1">Référence</p>
                     <p className="text-sm font-mono font-black text-primary tracking-widest">

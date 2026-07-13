@@ -90,8 +90,8 @@ export default function PaymentPage() {
   const amount = parseInt(booking.totalPrice);
 
   return (
-    <div className="min-h-screen bg-surface">
-      <div className="bg-white border-b border-border sticky top-0 z-30 px-6 py-4">
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="bg-surface border-b border-border sticky top-0 z-30 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
             onClick={() => router.back()}
@@ -121,14 +121,14 @@ export default function PaymentPage() {
                   className={cn(
                     "p-6 rounded-3xl border-2 text-left transition-all duration-200 relative",
                     method === id
-                      ? "border-primary bg-white shadow-xl shadow-primary/5"
-                      : "border-transparent bg-white/60 hover:bg-white hover:border-border"
+                      ? "border-primary bg-surface shadow-xl shadow-primary/5"
+                      : "border-border bg-surface-50 hover:bg-surface hover:border-primary/40"
                   )}
                 >
                   <div className="flex items-center gap-4">
                     <div className={cn(
                       "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
-                      method === id ? "bg-primary text-white" : "bg-surface-100 text-foreground/30"
+                      method === id ? "bg-primary text-white" : "bg-surface-100 text-foreground/40"
                     )}>
                       <Icon className="w-6 h-6" />
                     </div>
@@ -144,7 +144,7 @@ export default function PaymentPage() {
               ))}
             </div>
 
-            <Card className="p-8 border-none shadow-voyago rounded-3xl bg-white">
+            <Card className="p-8 border border-border shadow-voyago rounded-3xl bg-surface">
               <div className="flex items-center gap-3 mb-2">
                 <Smartphone className="w-5 h-5 text-primary" />
                 <h3 className="font-bold">Numéro à débiter</h3>
@@ -163,7 +163,7 @@ export default function PaymentPage() {
               </div>
             </Card>
 
-            <div className="flex items-center justify-center gap-2 text-foreground/30 py-2">
+            <div className="flex items-center justify-center gap-2 text-foreground/40 py-2">
               <ShieldCheck className="w-4 h-4" />
               <span className="text-[10px] font-bold uppercase tracking-widest">Transactions sécurisées SSL</span>
             </div>
@@ -171,7 +171,7 @@ export default function PaymentPage() {
 
           {/* Sidebar récap */}
           <aside>
-            <Card className="p-6 border-none shadow-voyago rounded-3xl bg-white sticky top-24 space-y-6">
+            <Card className="p-6 border border-border shadow-voyago rounded-3xl bg-surface sticky top-24 space-y-6">
               <h3 className="font-black text-xs uppercase text-foreground/40 tracking-widest">Résumé</h3>
 
               <div className="flex gap-3 items-start">

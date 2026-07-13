@@ -162,9 +162,9 @@ export default function BookingPage() {
   const rows = Object.keys(seatsByRow).map(Number).sort((a, b) => a - b);
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header sticky */}
-      <div className="bg-white border-b border-border sticky top-0 z-30 px-6 py-4">
+      <div className="bg-surface border-b border-border sticky top-0 z-30 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
             onClick={() => step === 2 ? setStep(1) : router.back()}
@@ -186,7 +186,7 @@ export default function BookingPage() {
                     "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black",
                     step > s.n ? "bg-primary text-white" :
                     step === s.n ? "bg-primary text-white ring-4 ring-primary/20" :
-                    "bg-surface-100 border border-border text-foreground/30"
+                    "bg-surface-50 border border-border text-foreground/30"
                   )}>
                     {s.n}
                   </span>
@@ -210,7 +210,7 @@ export default function BookingPage() {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Résumé du trajet */}
-            <Card className="p-6 border-none shadow-voyago rounded-2xl bg-white">
+            <Card className="p-6 border border-border shadow-voyago rounded-2xl bg-surface">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Bus className="w-5 h-5 text-primary" />
@@ -235,7 +235,7 @@ export default function BookingPage() {
 
             {/* Étape 1 : Sélection des sièges */}
             {step === 1 && (
-              <Card className="p-8 border-none shadow-voyago rounded-3xl">
+              <Card className="p-8 border border-border shadow-voyago rounded-3xl bg-surface">
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-xl font-black">Plan du bus</h2>
                   <Badge variant="info" className="bg-primary/10 text-primary border-none font-bold">
@@ -244,9 +244,9 @@ export default function BookingPage() {
                 </div>
 
                 {/* Légende */}
-                <div className="flex items-center gap-6 mb-8 text-[11px] font-bold text-foreground/40">
+                <div className="flex items-center gap-6 mb-8 text-[11px] font-bold text-foreground/50">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-md bg-white border-2 border-border" />
+                    <div className="w-5 h-5 rounded-md bg-surface-50 border-2 border-border" />
                     Libre
                   </div>
                   <div className="flex items-center gap-2">
@@ -267,16 +267,16 @@ export default function BookingPage() {
                     <p className="text-xs text-foreground/30 mt-1">Contactez la compagnie pour plus d'informations.</p>
                   </div>
                 ) : (
-                  <div className="bg-surface-100 rounded-2xl p-6 max-w-sm mx-auto space-y-3">
+                  <div className="bg-surface-50 border border-border rounded-2xl p-6 max-w-sm mx-auto space-y-3">
                     {/* Indicateur avant du bus */}
-                    <div className="flex items-center justify-center gap-2 mb-4 text-[10px] font-black uppercase text-foreground/30 tracking-widest">
-                      <div className="flex-grow h-px bg-border/50" />
-                      <Bus className="w-4 h-4" /> AVANT
-                      <div className="flex-grow h-px bg-border/50" />
+                    <div className="flex items-center justify-center gap-2 mb-4 text-[10px] font-black uppercase text-foreground/40 tracking-widest">
+                      <div className="flex-grow h-px bg-border" />
+                      <Bus className="w-4 h-4 text-primary" /> AVANT
+                      <div className="flex-grow h-px bg-border" />
                     </div>
                     {rows.map(rowNum => (
                       <div key={rowNum} className="flex items-center gap-2 justify-center">
-                        <span className="text-[10px] font-black text-foreground/20 w-4 text-right">{rowNum}</span>
+                        <span className="text-[10px] font-black text-foreground/30 w-4 text-right">{rowNum}</span>
                         <div className="flex gap-2">
                           {[...seatsByRow[rowNum]]
                             .sort((a, b) => a.colPos - b.colPos)
@@ -293,7 +293,7 @@ export default function BookingPage() {
                                       ? "bg-border/20 border-transparent text-foreground/20 cursor-not-allowed"
                                       : selectedSeats.find(s => s.id === seat.id)
                                         ? "bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-105"
-                                        : "bg-white border-border hover:border-primary/50 hover:bg-primary/5 text-foreground/60 cursor-pointer"
+                                        : "bg-surface border-border hover:border-primary/50 hover:bg-primary/10 text-foreground cursor-pointer"
                                   )}
                                 >
                                   {seat.status === "occupied" || seat.status === "locked"
@@ -311,7 +311,7 @@ export default function BookingPage() {
                 {selectedSeats.length > 0 && (
                   <div className="mt-6 flex flex-wrap gap-2">
                     {selectedSeats.sort((a, b) => a.seatNumber - b.seatNumber).map(s => (
-                      <span key={s.id} className="bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg">
+                      <span key={s.id} className="bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/20">
                         Siège {s.seatNumber}
                       </span>
                     ))}
@@ -325,7 +325,7 @@ export default function BookingPage() {
               <div className="space-y-4">
                 <h2 className="text-xl font-black">Informations des passagers</h2>
                 {selectedSeats.map((seat, index) => (
-                  <Card key={seat.id} className="p-8 border-none shadow-voyago rounded-3xl space-y-5">
+                  <Card key={seat.id} className="p-8 border border-border shadow-voyago rounded-3xl space-y-5 bg-surface">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center text-xs font-black">
                         {index + 1}
@@ -354,7 +354,7 @@ export default function BookingPage() {
 
           {/* Récapitulatif sidebar */}
           <aside>
-            <Card className="p-6 border-none shadow-voyago rounded-3xl bg-white sticky top-24 space-y-6">
+            <Card className="p-6 border border-border shadow-voyago rounded-3xl bg-surface sticky top-24 space-y-6">
               <h3 className="font-black text-xs uppercase text-foreground/40 tracking-widest">Récapitulatif</h3>
 
               <div className="space-y-3 text-sm">
