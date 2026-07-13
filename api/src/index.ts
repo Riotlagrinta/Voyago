@@ -30,6 +30,7 @@ import { errorHandler } from './middlewares/error.middleware';
 import { notFound } from './middlewares/notFound.middleware';
 import { setupSocketHandlers } from './lib/socket';
 import { startLockCleaner } from './lib/lockCleaner';
+import { initScheduleCron } from './jobs/scheduleGenerator.job';
 
 const app = express();
 const httpServer = createServer(app);
@@ -159,6 +160,7 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 export const startServer = async () => {
   await connectDB();
   startLockCleaner();
+  initScheduleCron();
 
   return httpServer.listen(PORT, () => {
     console.log(`

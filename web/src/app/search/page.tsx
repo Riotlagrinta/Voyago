@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { TripCardSkeleton } from "@/components/ui/TripCardSkeleton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import api from "@/lib/api";
 
 interface Schedule {
@@ -270,13 +271,16 @@ function SearchResultsContent() {
             </div>
           </div>
 
-          <Button
-            size="sm"
-            onClick={handleSearch}
-            className="w-full md:w-auto px-6 h-10 rounded-xl font-bold shadow-md shadow-primary/10 shrink-0"
-          >
-            <SearchIcon className="w-4 h-4 mr-2" /> Chercher
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              onClick={handleSearch}
+              className="w-full md:w-auto px-6 h-10 rounded-xl font-bold shadow-md shadow-primary/10 shrink-0"
+            >
+              <SearchIcon className="w-4 h-4 mr-2" /> Chercher
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
       </div>
 

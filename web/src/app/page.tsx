@@ -13,6 +13,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import dynamic from "next/dynamic";
 const Bus3D = dynamic(() => import("@/components/Bus3D"), { ssr: false });
 import ActiveSchedules from "@/components/ActiveSchedules";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   MapPin,
   Search,
@@ -86,8 +87,12 @@ export default function Home() {
           <div className="flex items-center gap-4">
             {!isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="sm" className="hidden sm:flex text-foreground/70 hover:text-primary" onClick={() => router.push("/login")}>Connexion</Button>
-                <Button size="sm" className="rounded-xl px-5" onClick={() => router.push("/register")}>S'inscrire</Button>
+                <Link href="/login" passHref>
+                  <Button variant="ghost" size="sm" className="hidden sm:flex text-foreground/70 hover:text-primary">Connexion</Button>
+                </Link>
+                <Link href="/register" passHref>
+                  <Button size="sm" className="rounded-xl px-5">S'inscrire</Button>
+                </Link>
               </div>
             ) : (
               <div className="flex items-center gap-3">
@@ -99,6 +104,7 @@ export default function Home() {
                 </Button>
               </div>
             )}
+            <ThemeToggle />
           </div>
         </div>
       </nav>
